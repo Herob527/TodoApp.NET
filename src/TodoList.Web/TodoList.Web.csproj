@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\TodoList.Application\TodoList.Application.csproj" />
+    <ProjectReference Include="..\TodoList.Domain\TodoList.Domain.csproj" />
+  </ItemGroup>
+</Project>
