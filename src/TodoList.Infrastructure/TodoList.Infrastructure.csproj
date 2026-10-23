@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\TodoList.Application\TodoList.Application.csproj" />
-  </ItemGroup>
-</Project>
