@@ -1,5 +1,6 @@
 {
   "appHost": {
-    "path": "TodoApp.AppHost/TodoApp.AppHost.csproj"
+    "path": "TodoApp.AppHost/TodoApp.AppHost.csproj",
+    "language": "csharp"
   }
 }
