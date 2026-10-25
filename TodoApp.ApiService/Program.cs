@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddMediatR(options => options.RegisterServicesFromAssemblyContaining<Program>());
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
