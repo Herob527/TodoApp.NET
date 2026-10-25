@@ -12,6 +12,7 @@ public class GetTodosQueryHandler(TodoContext db): IRequestHandler<GetTodosQuery
         .Todos
         .Skip(request.Page * pageSize)
         .Take(pageSize)
+        .OrderBy(t => t.LastUpdateDate)
         .Select(t => new TodoDto { Id = t.Id, Name = t.Name })
         .ToListAsync(cancellationToken: cancellationToken);
 }
