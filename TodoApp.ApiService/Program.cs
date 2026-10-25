@@ -1,9 +1,13 @@
+using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+
+builder.Services.AddDbContext<DbContext>();
 
 builder.Services.AddAuthentication().AddBearerToken();
 
