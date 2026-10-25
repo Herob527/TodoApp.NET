@@ -1,10 +1,15 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TodoApp.ApiService.Endpoints.Todo.Commands.CreateTodo;
+using TodoApp.ApiService.Endpoints.Todo.Commands.DeleteTodo;
+using TodoApp.ApiService.Endpoints.Todo.Commands.UpdateTodo;
 using TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
 
 namespace TodoApp.ApiService.Endpoints.Todo
 {
     public static class Endpoints
     {
+
         extension(IEndpointRouteBuilder app)
         {
             public void MapTodoEndpoints()
@@ -18,37 +23,35 @@ namespace TodoApp.ApiService.Endpoints.Todo
 
             }
         }
-        private static async Task<IResult> GetTodos([FromQuery] int page)
+        private static async Task<IResult> GetTodos(ISender sender, [FromQuery] int page)
         {
-            var todos = new GetTodosQuery { Page = page };
-            return Results.Json(todos);
+            var query = new GetTodosQuery(page);
+            var res = await sender.Send(query);
+            return TypedResults.Ok(res);
         }
 
         private record AddTodoRequest(string Name);
 
-        private static async Task<IResult> AddTodo([FromServices] TodoContext db, [FromForm] AddTodoRequest todo)
+        private static async Task<IResult> AddTodo(ISender sender, [FromForm] AddTodoRequest todo)
         {
-            db.Todos.Add(new Todo { Name = todo.Name });
-            await db.SaveChangesAsync();
-            return Results.Created();
+            var command = new CreateTodoCommand(todo.Name);
+            await sender.Send(command);
+
+            return TypedResults.Created();
         }
 
-        private static async Task<IResult> DeleteTodo([FromServices] TodoContext db, [FromRoute] int id)
+        private static async Task<IResult> DeleteTodo(ISender sender, [FromRoute] int id)
         {
-            var item = await db.Todos.FindAsync(id);
-            if (item is null) return Results.NotFound();
-            db.Remove(item);
-            await db.SaveChangesAsync();
-            return Results.StatusCode(200);
+            var command = new DeleteTodoCommand(id);
+            await sender.Send(command);
+            return TypedResults.Ok();
         }
 
-        private static async Task<IResult> UpdateTodo([FromServices] TodoContext db, [FromRoute] int id, [FromForm] AddTodoRequest todo)
+        private static async Task<IResult> UpdateTodo(ISender sender, [FromRoute] int id, [FromForm] AddTodoRequest todo)
         {
-            var item = await db.Todos.FindAsync(id);
-            if (item is null) return Results.NotFound();
-            item.Name = todo.Name;
-            await db.SaveChangesAsync();
-            return Results.StatusCode(200);
+            var command = new UpdateTodoCommand(id, todo.Name);
+            await sender.Send(command);
+            return TypedResults.Ok();
         }
     }
 }
