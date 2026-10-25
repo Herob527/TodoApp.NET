@@ -1,4 +1,4 @@
-namespace TodoApp.Domain;
+namespace TodoApp.Domain.Entity;
 
 public record Todo
 {

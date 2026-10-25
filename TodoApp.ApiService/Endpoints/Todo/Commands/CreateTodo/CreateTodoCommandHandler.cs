@@ -6,7 +6,8 @@ public class CreateTodoHandler(TodoContext db) : IRequestHandler<CreateTodoComma
 {
     public async Task Handle(CreateTodoCommand request, CancellationToken cancellationToken)
     {
-        db.Todos.Add(new Domain.Todo { Name = request.Name });
+        // TODO: Replace owner id with param
+        db.Todos.Add(new Domain.Entity.Todo { Name = request.Name, OwnerId = 1 });
         await db.SaveChangesAsync(cancellationToken);
     }
 }
