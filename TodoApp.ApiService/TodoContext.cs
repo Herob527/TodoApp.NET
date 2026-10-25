@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TodoApp.Domain;
 
 namespace TodoApp.ApiService;
 
