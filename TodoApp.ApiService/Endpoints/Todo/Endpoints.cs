@@ -20,7 +20,6 @@ public static class Endpoints
             group.MapPost("", AddTodo);
             group.MapDelete("{id}", DeleteTodo);
             group.MapPatch("{id}", UpdateTodo);
-
         }
     }
     private static async Task<IResult> GetTodos(ISender sender, [FromQuery] int page)
