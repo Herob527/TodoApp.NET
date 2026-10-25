@@ -7,7 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-builder.Services.AddDbContext<DbContext>();
+builder.Services.AddDbContext<TodoContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("appdata")));
 
 builder.Services.AddAuthentication().AddBearerToken();
 
