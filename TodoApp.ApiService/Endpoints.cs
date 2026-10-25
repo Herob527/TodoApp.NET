@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace TodoApp.ApiService;
 public static class Endpoints
 {
+  const int pageSize = 10;
+
 
   extension(IEndpointRouteBuilder app) {
     public void MapTodoEndpoints() {
@@ -18,7 +20,6 @@ public static class Endpoints
   }
     private static async Task<IResult> GetTodos([FromServices] TodoContext db, [FromQuery] int page = 0)
     {
-        const int pageSize = 10;
         var todos = await db.Todos.OrderBy(t => t.Id).Skip(page * pageSize).Take(pageSize).ToListAsync();
         return Results.Json(todos);
     }
