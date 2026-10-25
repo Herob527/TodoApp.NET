@@ -1,4 +1,4 @@
-namespace TodoApp.ApiService;
+namespace TodoApp.Domain;
 
 public record Todo
 {
