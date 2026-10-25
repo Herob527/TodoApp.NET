@@ -9,10 +9,10 @@ public static class Endpoints
     public void MapTodoEndpoints() {
 
       var group = app.MapGroup("/api/todos").WithTags("Todos").DisableAntiforgery();
-      group.MapGet("/", GetTodos);
-      group.MapPost("/", AddTodo);
-      group.MapDelete("/", DeleteTodo);
-      group.MapPatch("/", UpdateTodo);
+      group.MapGet("", GetTodos);
+      group.MapPost("", AddTodo);
+      group.MapDelete("{id}", DeleteTodo);
+      group.MapPatch("{id}", UpdateTodo);
 
     }
   }
@@ -32,18 +32,18 @@ public static class Endpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> DeleteTodo([FromServices] TodoContext db, [FromQuery] int id)
+    private static async Task<IResult> DeleteTodo([FromServices] TodoContext db, [FromRoute] int id)
     {
-      var item = await db.Todos.SingleAsync(t => t.Id == id);
+      var item = await db.Todos.FindAsync(id);
       if (item is null) return Results.NotFound();
       db.Remove(item);
       await db.SaveChangesAsync();
       return Results.StatusCode(200);
     }
 
-    private static async Task<IResult> UpdateTodo([FromServices] TodoContext db, [FromQuery] int id, [FromBody] string todo)
+    private static async Task<IResult> UpdateTodo([FromServices] TodoContext db, [FromRoute] int id, [FromBody] string todo)
     {
-      var item = await db.Todos.SingleAsync(t => t.Id == id);
+      var item = await db.Todos.FindAsync(id);
       if (item is null) return Results.NotFound();
       item.Name = todo;
       await db.SaveChangesAsync();
