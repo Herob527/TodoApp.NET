@@ -1,6 +1,6 @@
+using MediatR;
+
 namespace TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
-public class DeleteUserCommand
-{
-}
+public record DeleteUserCommand(int Id): IRequest;
 
 

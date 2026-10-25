@@ -1,6 +1,7 @@
+using MediatR;
+
 namespace TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
-public class RegisterUserCommand
-{
-}
+public record RegisterUserCommand(string FirstName, string LastName, string Email, string Password): IRequest;
+
 
 

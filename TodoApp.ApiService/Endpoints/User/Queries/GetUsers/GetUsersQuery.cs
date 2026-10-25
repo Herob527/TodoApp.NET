@@ -1,6 +1,6 @@
+using MediatR;
+
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
-public class GetUsersQuery
-{
-}
+public record GetUsersQuery(int Page): IRequest;
 
 
