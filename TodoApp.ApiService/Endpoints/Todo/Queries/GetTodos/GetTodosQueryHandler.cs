@@ -4,9 +4,10 @@ using TodoApp.ApiService.Dto;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
 
-public class GetTodosQueryHandler(TodoContext db): IRequest<GetTodosQuery>
+public class GetTodosQueryHandler(TodoContext db): IRequestHandler<GetTodosQuery, List<TodoDto>>
 {
     const int pageSize = 10;
+
     public async Task<List<TodoDto>> Handle(GetTodosQuery request, CancellationToken cancellationToken) => await db
         .Todos
         .Skip(request.Page * pageSize)
