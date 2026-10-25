@@ -20,7 +20,7 @@ public static class Endpoints
     {
         const int pageSize = 10;
         var todos = await db.Todos.Skip(page * pageSize).Take(pageSize).ToListAsync();
-        return Results.Json( todos );
+        return Results.Json(todos);
     }
 
     private static async Task<IResult> AddTodo([FromServices] TodoContext db) => Results.Json(new { message = "Hello from .NET 10" });
