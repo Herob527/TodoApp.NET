@@ -10,6 +10,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.6.4"></PackageReference>
+    <PackageReference Include="FluentValidation" Version="12.2.0" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12"></PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
