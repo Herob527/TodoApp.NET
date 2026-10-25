@@ -1,10 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+using TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
+
 namespace TodoApp.ApiService.Endpoints.Todo
 {
     public static class Endpoints
     {
-        const int pageSize = 10;
-
-
         extension(IEndpointRouteBuilder app)
         {
             public void MapTodoEndpoints()
@@ -18,9 +18,9 @@ namespace TodoApp.ApiService.Endpoints.Todo
 
             }
         }
-        private static async Task<IResult> GetTodos([FromServices] TodoContext db, [FromQuery] int page = 0)
+        private static async Task<IResult> GetTodos([FromQuery] int page)
         {
-            var todos = await db.Todos.OrderBy(t => t.Id).Skip(page * pageSize).Take(pageSize).ToListAsync();
+            var todos = new GetTodosQuery { Page = page };
             return Results.Json(todos);
         }
 
