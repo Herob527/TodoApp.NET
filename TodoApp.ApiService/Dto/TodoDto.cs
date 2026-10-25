@@ -1,9 +1,8 @@
-namespace TodoApp.ApiService.Dto
+namespace TodoApp.ApiService.Dto;
+
+public record TodoDto
 {
-    public record TodoDto
-    {
-      int Id { get; init; }
-      string Name { get; init; }
-      bool IsComplete { get; init; }
-    }
+  public int Id { get; init; }
+  public string Name { get; init; }
+  public bool IsComplete { get; init; }
 }
