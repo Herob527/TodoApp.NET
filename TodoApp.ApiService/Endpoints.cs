@@ -19,7 +19,7 @@ public static class Endpoints
     private static async Task<IResult> GetTodos([FromServices] TodoContext db, [FromQuery] int page = 0)
     {
         const int pageSize = 10;
-        var todos = await db.Todos.Skip(page * pageSize).Take(pageSize).ToListAsync();
+        var todos = await db.Todos.OrderBy(t => t.Id).Skip(page * pageSize).Take(pageSize).ToListAsync();
         return Results.Json(todos);
     }
 
@@ -41,11 +41,11 @@ public static class Endpoints
       return Results.StatusCode(200);
     }
 
-    private static async Task<IResult> UpdateTodo([FromServices] TodoContext db, [FromRoute] int id, [FromBody] string todo)
+    private static async Task<IResult> UpdateTodo([FromServices] TodoContext db, [FromRoute] int id, [FromForm] AddTodoRequest todo)
     {
       var item = await db.Todos.FindAsync(id);
       if (item is null) return Results.NotFound();
-      item.Name = todo;
+      item.Name = todo.Name;
       await db.SaveChangesAsync();
       return Results.StatusCode(200);
     }
