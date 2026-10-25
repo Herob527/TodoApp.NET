@@ -3,9 +3,10 @@ using TodoApp.ApiService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+
+builder.Services.AddMediatR(options => options.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
@@ -21,7 +22,6 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
@@ -29,7 +29,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
 
 app.MapDefaultEndpoints();
 
