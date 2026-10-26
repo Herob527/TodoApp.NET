@@ -29,17 +29,13 @@ public static class Endpoints
     private static async Task<IResult> GetUser(ISender sender, [FromRoute] int id)
     {
         var query = new GetUserQuery(id);
-        return TypedResults.Ok(
-            // await sender.Send(query)
-            );
+        return TypedResults.Ok(await sender.Send(query));
     }
 
     private static async Task<IResult> GetUsers(ISender sender, [FromQuery] int page)
     {
         var query = new GetUsersQuery(page);
-        return TypedResults.Ok(
-            // await sender.Send(query)
-            );
+        return TypedResults.Ok(await sender.Send(query));
     }
 
     private static async Task<IResult> AddUser(ISender sender, [FromForm] CreateUserCommand command)
