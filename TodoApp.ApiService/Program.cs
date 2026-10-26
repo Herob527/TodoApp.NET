@@ -19,6 +19,7 @@ builder.Services.AddDbContext<TodoContext>(options =>
         builder.Configuration.GetConnectionString("appdata")));
 
 builder.Services.AddAuthentication().AddBearerToken();
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
