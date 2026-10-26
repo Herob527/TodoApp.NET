@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TodoApp.ApiService.Endpoints.User.Commands.AddUser;
+using TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 using TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
 using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
@@ -42,7 +42,7 @@ public static class Endpoints
             );
     }
 
-    private static async Task<IResult> AddUser(ISender sender, [FromForm] AddUserCommand command)
+    private static async Task<IResult> AddUser(ISender sender, [FromForm] CreateUserCommand command)
     {
         await sender.Send(command);
         return TypedResults.Created();

@@ -1,10 +1,10 @@
 using MediatR;
 
-namespace TodoApp.ApiService.Endpoints.User.Commands.AddUser;
+namespace TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 
-public class AddUserCommandHandler(TodoContext db, IPasswordHelper passwordHelper) : IRequestHandler<AddUserCommand>
+public class CreateUserCommandHandler(TodoContext db, IPasswordHelper passwordHelper) : IRequestHandler<CreateUserCommand>
 {
-    public async Task Handle(AddUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var hashedPassword = passwordHelper.HashPassword(request.Name, request.Password);
 
