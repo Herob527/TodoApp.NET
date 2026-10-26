@@ -15,7 +15,7 @@ public static class Endpoints
     {
         public void MapUserEndpoints()
         {
-            var group = app.MapGroup("/api/users").WithTags("Users").DisableAntiforgery();
+            var group = app.MapGroup("/api/users").WithTags("Users");
 
             group.MapGet("/{id}", GetUser);
             group.MapGet("/", GetUsers);
