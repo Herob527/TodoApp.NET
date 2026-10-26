@@ -14,6 +14,7 @@ public class GetUsersQueryHandler(TodoContext db) : IRequestHandler<GetUsersQuer
         return await db.Users
           .Skip(request.Page * pageSize)
           .Take(pageSize)
+          .OrderBy(x => x.Id)
           .ProjectToType<UserDto>()
           .ToListAsync(cancellationToken);
     }
