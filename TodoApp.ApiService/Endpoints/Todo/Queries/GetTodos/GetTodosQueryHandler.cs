@@ -1,3 +1,4 @@
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Dto;
@@ -13,6 +14,6 @@ public class GetTodosQueryHandler(TodoContext db): IRequestHandler<GetTodosQuery
         .Skip(request.Page * pageSize)
         .Take(pageSize)
         .OrderBy(t => t.LastUpdateDate)
-        .Select(t => new TodoDto { Id = t.Id, Name = t.Name })
+        .ProjectToType<TodoDto>()
         .ToListAsync(cancellationToken: cancellationToken);
 }
