@@ -1,6 +1,7 @@
 using MediatR;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
+
 public class RegisterUserCommandHandler(TodoContext db, IPasswordHelper passwordHelper) : IRequestHandler<RegisterUserCommand>
 {
     public async Task Handle(RegisterUserCommand request, CancellationToken cancellationToken)
