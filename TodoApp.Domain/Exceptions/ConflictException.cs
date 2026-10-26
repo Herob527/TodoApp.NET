@@ -1,3 +1,3 @@
 namespace TodoApp.Domain.Exceptions;
 
-public class ConflictException: Exception;
+public class ConflictException: HttpRequestException;
