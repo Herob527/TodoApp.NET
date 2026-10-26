@@ -21,7 +21,7 @@ public class RegisterUserCommandHandler(TodoContext db, IPasswordHelper password
             Name = request.Name,
             Password = hashedPassword,
         };
-        db.Add(existingUser);
+        db.Add(user);
 
         await db.SaveChangesAsync(cancellationToken);
     }
