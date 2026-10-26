@@ -1,30 +1,27 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TodoApp.Domain.Entity;
 using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 
-public class CreateUserCommandHandler(TodoContext db, IPasswordHelper passwordHelper) : IRequestHandler<CreateUserCommand>
+public class CreateUserCommandHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<CreateUserCommand>
 {
     public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
 
-        var existingUser = await db.Users.SingleOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
+        var existingUser = await userManager.Users.SingleOrDefaultAsync(x => x.UserName == request.Name, cancellationToken);
         if (existingUser is not null)
         {
             throw new ConflictException();
         }
 
-        var hashedPassword = passwordHelper.HashPassword(request.Name, request.Password);
-
-        var user = new Domain.Entity.User
+        await userManager.CreateAsync(new ApplicationUser
         {
-            Name = request.Name,
-            Password = hashedPassword,
+            UserName = request.Name,
             Role = request.Role
-        };
-        db.Add(user);
+        });
 
-        await db.SaveChangesAsync(cancellationToken);
     }
 }

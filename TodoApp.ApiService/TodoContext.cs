@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Domain.Entity;
 
 namespace TodoApp.ApiService;
 
 public class TodoContext(DbContextOptions<TodoContext> options)
-    : DbContext(options)
+        : IdentityDbContext<ApplicationUser>(options)
 {
-  public DbSet<Todo> Todos {get; set;}
-  public DbSet<User> Users {get; set;}
+
+    // Your existing todo entities:
+    public DbSet<Todo> Todos => Set<Todo>();
 }

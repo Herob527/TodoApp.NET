@@ -1,4 +1,6 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
@@ -18,8 +20,19 @@ builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("appdata")));
 
-builder.Services.AddAuthentication().AddBearerToken();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
+        options => builder.Configuration.Bind("JwtSettings", options))
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+        options => builder.Configuration.Bind("CookieSettings", options));
+
+builder.Services
+    .AddIdentityApiEndpoints<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<TodoContext>();
+
 builder.Services.AddAuthorization();
+
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -43,6 +56,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapDefaultEndpoints();
+
+app.MapIdentityApi<IdentityUser>();
 
 app.MapTodoEndpoints();
 

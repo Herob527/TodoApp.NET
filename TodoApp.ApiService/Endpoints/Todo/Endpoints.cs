@@ -15,7 +15,7 @@ public static class Endpoints
         public void MapTodoEndpoints()
         {
 
-            var group = app.MapGroup("/api/todos").WithTags("Todos");
+            var group = app.MapGroup("/api/todos").WithTags("Todos").RequireAuthorization();
             group.MapGet("", GetTodos);
             group.MapPost("", AddTodo);
             group.MapDelete("{id}", DeleteTodo);

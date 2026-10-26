@@ -1,5 +1,8 @@
 namespace TodoApp.Domain.Entity;
 
+using TodoApp.Domain.Enum;
+
+
 public record Todo
 {
   public int Id { get; init; }
@@ -8,5 +11,5 @@ public record Todo
   public DateTime CreationDate {get;init;} = DateTime.UtcNow;
   public DateTime LastUpdateDate {get;init;} = DateTime.UtcNow;
   public required int OwnerId { get; set; }
-  public User Owner { get; set; }
+  public ApplicationUser Owner { get; set; }
 }
