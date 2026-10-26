@@ -5,7 +5,8 @@ using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 
-[UserRole(Role.Admin, Role.User)]
+[Authorize]
+[UserRole(Role.Admin)]
 public record CreateUserCommand(string Name, string Email, string Password, Role Role): IRequest;
 
 
