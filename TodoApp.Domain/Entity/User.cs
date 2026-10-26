@@ -1,3 +1,11 @@
 namespace TodoApp.Domain.Entity;
 
-public record User(int Id, string Name, string Password, Role Role);
+using TodoApp.Domain.Enum;
+
+public record User
+{
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public string Password { get; init; }
+    public Role Role { get; init; }
+}

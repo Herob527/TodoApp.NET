@@ -1,4 +1,5 @@
-namespace TodoApp.Domain.Enums;
+namespace TodoApp.Domain.Enum;
+
 public enum Role
 {
   User,

@@ -1,6 +1,8 @@
 using MediatR;
+using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.AddUser;
-public record AddUserCommand(string FirstName, string LastName, string Email, string Password): IRequest;
+
+public record AddUserCommand(string Name, string Email, string Password, Role Role): IRequest;
 
 
