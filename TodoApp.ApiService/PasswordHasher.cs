@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using TodoApp.Domain;
 
 public interface IPasswordHelper
 {
@@ -7,10 +6,8 @@ public interface IPasswordHelper
     bool VerifyPassword(string userName, string hashedPassword, string password);
 }
 
-public class PasswordHelper(IPasswordHasher<string> passwordHasher) : IPasswordHelper
+public class PasswordHelper(IPasswordHasher<string> _passwordHasher) : IPasswordHelper
 {
-    private readonly IPasswordHasher<string> _passwordHasher = passwordHasher;
-
     public string HashPassword(string userName, string password)
     {
         return _passwordHasher.HashPassword(userName, password);
