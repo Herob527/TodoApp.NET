@@ -21,7 +21,7 @@ public class CreateUserCommandHandler(UserManager<ApplicationUser> userManager) 
         {
             UserName = request.Name,
             Role = request.Role
-        });
+        }, request.Password);
 
     }
 }
