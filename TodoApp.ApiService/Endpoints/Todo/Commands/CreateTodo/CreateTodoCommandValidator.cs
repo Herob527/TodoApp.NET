@@ -6,6 +6,6 @@ public class CreateTodoValidator: AbstractValidator<CreateTodoCommand>
 {
   public CreateTodoValidator()
   {
-    RuleFor(x => x.UserName).NotEmpty().MaximumLength(50);
+    RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
   }
 }

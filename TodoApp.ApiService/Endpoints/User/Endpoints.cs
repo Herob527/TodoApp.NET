@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 using TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
+using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUser;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
@@ -19,6 +20,7 @@ public static class Endpoints
             group.MapGet("/{id}", GetUser);
             group.MapGet("/", GetUsers);
             group.MapPost("/", AddUser);
+            group.MapPost("/register", RegisterUser);
             group.MapPatch("/{id}", UpdateUser);
             group.MapDelete("/{id}", DeleteUser);
         }
@@ -42,14 +44,20 @@ public static class Endpoints
         return TypedResults.Created();
     }
 
-    private static async Task<IResult> UpdateUser(ISender sender, [FromRoute] int id, [FromForm] UpdateUserData data)
+    private static async Task<IResult> RegisterUser(ISender sender, [FromForm] RegisterUserCommand command)
+    {
+        await sender.Send(command);
+        return TypedResults.Created();
+    }
+
+    private static async Task<IResult> UpdateUser(ISender sender, [FromRoute] string id, [FromForm] UpdateUserData data)
     {
         var command = new UpdateUserCommand(id, data);
 
         await sender.Send(command);
         return TypedResults.Ok();
     }
-    private static async Task<IResult> DeleteUser(ISender sender, [FromRoute] int id)
+    private static async Task<IResult> DeleteUser(ISender sender, [FromRoute] string id)
     {
         var command = new DeleteUserCommand(id);
         await sender.Send(command);

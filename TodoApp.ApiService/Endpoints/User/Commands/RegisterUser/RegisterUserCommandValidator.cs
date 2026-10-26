@@ -1,14 +1,13 @@
 using FluentValidation;
 
-namespace TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
+namespace TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 
-public class CreateUserCommandValidator: AbstractValidator<CreateUserCommand>
+public class RegisterUserCommandValidator: AbstractValidator<RegisterUserCommand>
 {
-  public CreateUserCommandValidator()
+  public RegisterUserCommandValidator()
   {
-    RuleFor(x => x.UserName).NotEmpty().MinimumLength(3).MaximumLength(40);
+    RuleFor(x => x.Name).NotEmpty().MinimumLength(3).MaximumLength(40);
     RuleFor(x => x.Password).NotEmpty().MinimumLength(8).MaximumLength(40);
-    RuleFor(x => x.Role).NotEmpty().IsInEnum();
   }
 }
 
