@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 using TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
+using TodoApp.ApiService.Endpoints.User.Commands.LoginUser;
 using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUser;
@@ -21,6 +22,7 @@ public static class Endpoints
             group.MapGet("/", GetUsers);
             group.MapPost("/", AddUser);
             group.MapPost("/register", RegisterUser);
+            group.MapPost("/login", LoginUser);
             group.MapPatch("/{id}", UpdateUser);
             group.MapDelete("/{id}", DeleteUser);
         }
@@ -45,6 +47,12 @@ public static class Endpoints
     }
 
     private static async Task<IResult> RegisterUser(ISender sender, [FromForm] RegisterUserCommand command)
+    {
+        await sender.Send(command);
+        return TypedResults.Created();
+    }
+    
+    private static async Task<IResult> LoginUser(ISender sender, [FromForm] LoginUserCommand command)
     {
         await sender.Send(command);
         return TypedResults.Created();
