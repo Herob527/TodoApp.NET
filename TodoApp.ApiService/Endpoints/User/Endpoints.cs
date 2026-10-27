@@ -48,7 +48,7 @@ public static class Endpoints
         return TypedResults.Created();
     }
 
-    private static async Task<IResult> RegisterUser(ISender sender, [FromForm] RegisterUserCommand command)
+    private static async Task<IResult> RegisterUser(ISender sender, [FromBody] RegisterUserCommand command)
     {
         await sender.Send(command);
         return TypedResults.Created();
