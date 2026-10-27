@@ -29,5 +29,7 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
         {
           throw new NotFoundException();
         }
+        var createdUser = await userManager.Users.SingleAsync(x => x.UserName == request.Name, cancellationToken: cancellationToken);
+        await signInManager.SignInAsync(createdUser, false);
     }
 }
