@@ -57,8 +57,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapDefaultEndpoints();
 
-app.MapIdentityApi<IdentityUser>();
-
 app.MapTodoEndpoints();
 
 app.MapUserEndpoints();
