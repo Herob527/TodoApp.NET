@@ -241,15 +241,13 @@ namespace TodoApp.ApiService.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("OwnerId1")
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId1");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Todos");
                 });
@@ -309,7 +307,9 @@ namespace TodoApp.ApiService.Migrations
                 {
                     b.HasOne("TodoApp.Domain.Entity.ApplicationUser", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId1");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Owner");
                 });
