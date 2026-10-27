@@ -7,9 +7,8 @@ public class CreateTodoHandler(TodoContext db, IHttpContextAccessor accessor) : 
 {
     public async Task Handle(CreateTodoCommand request, CancellationToken cancellationToken)
     {
-        var userId = accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId is null) return;
-        // TODO: Replace owner id with param
+        var userId = (accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)) ?? throw new UnauthorizedAccessException();
+
         db.Todos.Add(new Domain.Entity.Todo { Name = request.Name, OwnerId = userId });
         await db.SaveChangesAsync(cancellationToken);
     }
