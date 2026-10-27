@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 using TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
 using TodoApp.ApiService.Endpoints.User.Commands.LoginUser;
+using TodoApp.ApiService.Endpoints.User.Commands.LogoutUser;
 using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUser;
@@ -23,6 +24,7 @@ public static class Endpoints
             group.MapPost("/", AddUser);
             group.MapPost("/register", RegisterUser);
             group.MapPost("/login", LoginUser);
+            group.MapPost("/logout", LogoutUser);
             group.MapPatch("/{id}", UpdateUser);
             group.MapDelete("/{id}", DeleteUser);
         }
@@ -51,7 +53,11 @@ public static class Endpoints
         await sender.Send(command);
         return TypedResults.Created();
     }
-    
+
+    private static async Task<IResult> LogoutUser(ISender sender, [FromForm] LogoutUserCommand command) {
+        await sender.Send(command);
+        return TypedResults.Ok();
+    }
     private static async Task<IResult> LoginUser(ISender sender, [FromForm] LoginUserCommand command)
     {
         await sender.Send(command);
