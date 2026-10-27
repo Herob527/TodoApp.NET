@@ -10,9 +10,15 @@ public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager, S
 {
     public async Task Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
+        var user = await userManager.FindByNameAsync(request.Name);
+        if (user is null)
+        {
+            Console.WriteLine("UserIsNull");
+            throw new NotFoundException();
+          }
 
         var result = await signInManager.PasswordSignInAsync(user, request.Password, true, false);
+        Console.WriteLine("result.Succeeded: " + result.Succeeded);
         if (!result.Succeeded)
         {
             throw new NotFoundException();

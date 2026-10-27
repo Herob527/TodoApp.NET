@@ -54,11 +54,11 @@ public static class Endpoints
         return TypedResults.Created();
     }
 
-    private static async Task<IResult> LogoutUser(ISender sender, [FromForm] LogoutUserCommand command) {
-        await sender.Send(command);
+    private static async Task<IResult> LogoutUser(ISender sender) {
+        await sender.Send(new LogoutUserCommand());
         return TypedResults.Ok();
     }
-    private static async Task<IResult> LoginUser(ISender sender, [FromForm] LoginUserCommand command)
+    private static async Task<IResult> LoginUser(ISender sender, [FromBody] LoginUserCommand command)
     {
         await sender.Send(command);
         return TypedResults.Created();

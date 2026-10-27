@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,7 @@ builder.Services.AddDbContext<TodoContext>(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
         options => builder.Configuration.Bind("JwtSettings", options))
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+    .AddCookie("Identity.Application",
         options => builder.Configuration.Bind("CookieSettings", options));
 
 builder.Services.AddIdentityCore<ApplicationUser>()
@@ -40,6 +41,8 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddAntiforgery((options) => options.HeaderName = "X-XSRF-TOKEN");
 
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -57,10 +60,24 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseAntiforgery();
+
 app.MapDefaultEndpoints();
 
 app.MapTodoEndpoints();
 
 app.MapUserEndpoints();
+
+app.MapGet("/antiforgery/token", (
+    HttpContext context,
+    IAntiforgery antiforgery) =>
+{
+    var tokens = antiforgery.GetAndStoreTokens(context);
+
+    return Results.Ok(new
+    {
+        requestToken = tokens.RequestToken
+    });
+});
 
 app.Run();
