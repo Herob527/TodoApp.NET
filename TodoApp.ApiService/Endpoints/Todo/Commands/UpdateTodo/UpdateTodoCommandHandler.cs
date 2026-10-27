@@ -1,13 +1,23 @@
 using MediatR;
+using TodoApp.ApiService.Repository;
+using TodoApp.Domain.Enum;
+using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Commands.UpdateTodo;
 
-public class UpdateTodoHandler(TodoContext db): IRequestHandler<UpdateTodoCommand>
+public class UpdateTodoHandler(TodoContext db, UserRepository userRepository): IRequestHandler<UpdateTodoCommand>
 {
   public async Task Handle(UpdateTodoCommand request, CancellationToken cancellationToken)
   {
-      var item = await db.Todos.FindAsync([request.Id], cancellationToken: cancellationToken);
-      if (item is null) return;
+
+      var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
+      var item = await db.Todos.FindAsync([request.Id], cancellationToken: cancellationToken) ?? throw new NotFoundException();
+
+      var isOwner = item.OwnerId == userId;
+      var isAdmin = item.Owner.Role == Role.Admin;
+
+      if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
+
       item.Name = request.NewName;
       await db.SaveChangesAsync(cancellationToken);
   }
