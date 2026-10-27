@@ -306,12 +306,17 @@ namespace TodoApp.ApiService.Migrations
             modelBuilder.Entity("TodoApp.Domain.Entity.Todo", b =>
                 {
                     b.HasOne("TodoApp.Domain.Entity.ApplicationUser", "Owner")
-                        .WithMany()
+                        .WithMany("Todos")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.Entity.ApplicationUser", b =>
+                {
+                    b.Navigation("Todos");
                 });
 #pragma warning restore 612, 618
         }
