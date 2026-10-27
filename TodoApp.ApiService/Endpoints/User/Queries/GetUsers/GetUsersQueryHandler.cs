@@ -18,6 +18,7 @@ public class GetUsersQueryHandler(UserManager<ApplicationUser> userManager) : IR
           .Take(pageSize)
           .OrderBy(x => x.Id)
           .ProjectToType<UserDto>()
+          .AsNoTracking()
           .ToListAsync(cancellationToken);
     }
 }

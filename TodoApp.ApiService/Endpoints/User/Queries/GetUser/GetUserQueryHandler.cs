@@ -12,7 +12,11 @@ public class GetUserQueryHandler(UserManager<ApplicationUser> userManager) : IRe
 {
     public async Task<UserDto> Handle(GetUserQuery request, CancellationToken cancellationToken)
     {
-        return await userManager.Users.ProjectToType<UserDto>().SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
+        return await userManager
+            .Users
+            .ProjectToType<UserDto>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
     }
 }
 

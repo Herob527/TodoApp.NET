@@ -22,6 +22,7 @@ public class GetTodosQueryHandler(TodoContext db, UserRepository userRepository)
           .OrderBy(t => t.LastUpdateDate)
           .Where(t => t.OwnerId == userId)
           .ProjectToType<TodoDto>()
+          .AsNoTracking()
           .ToListAsync(cancellationToken: cancellationToken);
     }
 }
