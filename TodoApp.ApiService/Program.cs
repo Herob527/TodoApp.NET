@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
 using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
+using TodoApp.Domain.Entity;
+using TodoApp.Domain.Enum;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,8 +28,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
         options => builder.Configuration.Bind("CookieSettings", options));
 
-builder.Services
-    .AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<TodoContext>();
 
@@ -39,6 +40,12 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+
+builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
 var app = builder.Build();
 
