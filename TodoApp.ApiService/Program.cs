@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +9,6 @@ using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
-using TodoApp.Domain.Enum;
 
 var builder = WebApplication.CreateBuilder(args);
 

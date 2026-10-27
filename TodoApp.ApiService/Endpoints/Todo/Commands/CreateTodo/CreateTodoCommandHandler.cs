@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using MediatR;
 using TodoApp.ApiService.Repository;
 
