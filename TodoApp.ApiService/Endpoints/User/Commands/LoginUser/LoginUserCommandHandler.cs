@@ -17,8 +17,5 @@ public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager, S
         {
             throw new NotFoundException();
         }
-
-
-
     }
 }
