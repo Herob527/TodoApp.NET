@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
 using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
+using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
 using TodoApp.Domain.Enum;
 
@@ -56,6 +57,8 @@ builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
+
+builder.Services.AddScoped<UserRepository>();
 
 var app = builder.Build();
 
