@@ -5,16 +5,20 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.LoginUser;
 
-public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager)
+public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     : IRequestHandler<LoginUserCommand>
 {
     public async Task Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
 
-        if (!await userManager.CheckPasswordAsync(user, request.Password))
+        var result = await signInManager.PasswordSignInAsync(user, request.Password, false, false);
+        if (!result.Succeeded)
         {
             throw new NotFoundException();
         }
+
+
+
     }
 }
