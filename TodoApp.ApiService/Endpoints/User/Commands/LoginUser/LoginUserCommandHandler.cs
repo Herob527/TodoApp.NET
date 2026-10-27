@@ -12,7 +12,7 @@ public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager, S
     {
         var user = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
 
-        var result = await signInManager.PasswordSignInAsync(user, request.Password, false, false);
+        var result = await signInManager.PasswordSignInAsync(user, request.Password, true, false);
         if (!result.Succeeded)
         {
             throw new NotFoundException();
