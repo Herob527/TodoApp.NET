@@ -1,14 +1,20 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
+using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.DeleteUser;
 
-public class DeleteUsercommandHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<DeleteUserCommand>
+public class DeleteUsercommandHandler(UserManager<ApplicationUser> userManager, UserRepository userRepository) : IRequestHandler<DeleteUserCommand>
 {
     public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
+      var isCurrentAdmin = userRepository.Role == Role.Admin;
+
+      if (!isCurrentAdmin) throw new UnauthorizedAccessException();
+
       var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
       await userManager.DeleteAsync(user);
     }
