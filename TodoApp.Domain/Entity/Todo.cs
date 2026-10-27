@@ -10,6 +10,6 @@ public record Todo
   public bool IsComplete { get; init; }
   public DateTime CreationDate {get;init;} = DateTime.UtcNow;
   public DateTime LastUpdateDate {get;init;} = DateTime.UtcNow;
-  public required int OwnerId { get; set; }
+  public required string OwnerId { get; set; }
   public ApplicationUser Owner { get; set; }
 }
