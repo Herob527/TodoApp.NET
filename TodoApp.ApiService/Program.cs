@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
@@ -33,7 +34,13 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<TodoContext>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder().SetDefaultPolicy(
+    new AuthorizationPolicyBuilder(
+      JwtBearerDefaults.AuthenticationScheme, "Identity.Application"
+    )
+    .RequireAuthenticatedUser()
+    .Build()
+);
 
 
 // Add services to the container.
