@@ -31,7 +31,7 @@ public static class Endpoints
 
     private record AddTodoRequest(string Name);
 
-    private static async Task<IResult> AddTodo(ISender sender, [FromForm] AddTodoRequest todo)
+    private static async Task<IResult> AddTodo(ISender sender, [FromBody] AddTodoRequest todo)
     {
         var command = new CreateTodoCommand(todo.Name);
         await sender.Send(command);
@@ -46,7 +46,7 @@ public static class Endpoints
         return TypedResults.Ok();
     }
 
-    private static async Task<IResult> UpdateTodo(ISender sender, [FromRoute] int id, [FromForm] AddTodoRequest todo)
+    private static async Task<IResult> UpdateTodo(ISender sender, [FromRoute] int id, [FromBody] AddTodoRequest todo)
     {
         var command = new UpdateTodoCommand(id, todo.Name);
         await sender.Send(command);
