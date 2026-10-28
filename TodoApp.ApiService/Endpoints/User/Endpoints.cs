@@ -21,7 +21,7 @@ public static class Endpoints
 
             group.MapGet("/{id}", GetUser);
             group.MapGet("/", GetUsers);
-            group.MapPost("/", AddUser);
+            group.MapPost("/", CreateUser);
             group.MapPost("/register", RegisterUser);
             group.MapPost("/login", LoginUser);
             group.MapPost("/logout", LogoutUser);
@@ -42,7 +42,7 @@ public static class Endpoints
         return TypedResults.Ok(await sender.Send(query));
     }
 
-    private static async Task<IResult> AddUser(ISender sender, [FromForm] CreateUserCommand command)
+    private static async Task<IResult> CreateUser(ISender sender, [FromBody] CreateUserCommand command)
     {
         await sender.Send(command);
         return TypedResults.Created();
