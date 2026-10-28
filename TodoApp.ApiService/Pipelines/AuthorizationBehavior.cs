@@ -3,7 +3,6 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using TodoApp.ApiService.Authorization;
 using TodoApp.Domain.Entity;
 
 namespace TodoApp.ApiService.Pipelines;
