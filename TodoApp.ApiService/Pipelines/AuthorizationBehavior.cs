@@ -58,23 +58,6 @@ public class AuthorizationBehavior<TRequest, TResponse>(
             }
         }
 
-        var roleAttribute = requestType.GetCustomAttribute<AuthorizeRoleAttribute>();
-        if (roleAttribute != null)
-        {
-            var requiredRole = roleAttribute.Policy;
-            if (string.IsNullOrEmpty(requiredRole) && !string.IsNullOrEmpty(roleAttribute.Roles))
-            {
-                requiredRole = roleAttribute.Roles;
-            }
-
-            if (string.IsNullOrEmpty(requiredRole) || !userRoles.Contains(requiredRole))
-            {
-                throw new UnauthorizedAccessException();
-            }
-
-            return await next(cancellationToken);
-        }
-
         var authorizeAttribute = requestType.GetCustomAttribute<AuthorizeAttribute>();
         if (authorizeAttribute != null)
         {
