@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
@@ -11,7 +12,10 @@ public class UpdateTodoHandler(TodoContext db, UserRepository userRepository): I
   {
 
       var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
-      var item = await db.Todos.FindAsync([request.Id], cancellationToken: cancellationToken) ?? throw new NotFoundException();
+      var item = await db
+          .Todos
+          .Include(t => t.Owner)
+          .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
 
       var isOwner = item.OwnerId == userId;
       var isAdmin = item.Owner.Role == Role.Admin;
