@@ -23,6 +23,20 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+
+        catch (BadHttpRequestException)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Bad Request"
+            };
+
+
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { problemDetails });
+            return;
+        }
         catch (ValidationException exception)
         {
             var problemDetails = new ProblemDetails
@@ -60,6 +74,18 @@ public class ExceptionHandlingMiddleware
             };
 
             context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(problemDetails);
+            return;
+        }
+        catch (ConflictException) {
+
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Conflict"
+            };
+
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
             await context.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
