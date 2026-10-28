@@ -6,6 +6,6 @@ public class UpdateTodoValidator: AbstractValidator<UpdateTodoCommand>
 {
   public UpdateTodoValidator()
     {
-        RuleFor(x => x.NewName).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.Data.Name).NotEmpty().MaximumLength(50);
     }
 }
