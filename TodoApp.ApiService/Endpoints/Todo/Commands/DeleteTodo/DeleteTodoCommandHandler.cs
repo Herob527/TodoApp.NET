@@ -1,8 +1,6 @@
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Repository;
-using TodoApp.Domain.Entity;
 using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
 
