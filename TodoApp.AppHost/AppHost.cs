@@ -4,6 +4,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var postgres = builder
       .AddPostgres("db")
       .WithContainerName("todo-db")
+      .WithDataVolume("appdata")
       .AddDatabase("appdata");
 
 var migrations = builder
