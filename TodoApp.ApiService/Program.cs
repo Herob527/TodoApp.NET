@@ -23,7 +23,7 @@ builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("appdata")));
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
         options => builder.Configuration.Bind("JwtSettings", options))
     .AddCookie("Identity.Application",
@@ -39,7 +39,7 @@ builder.Services.AddAuthorizationBuilder().SetDefaultPolicy(
     )
     .RequireAuthenticatedUser()
     .Build()
-);
+).AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
 
 
 // Add services to the container.
