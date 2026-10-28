@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
-using TodoApp.ApiService.Pipelines;
 using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
+using TodoApp.ApiService.Middlewares;
+using TodoApp.ApiService.Pipelines;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
 
@@ -16,14 +16,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-builder.Services.AddMediatR(options =>
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddMediatR(cfg =>
 {
-    options.RegisterServicesFromAssemblyContaining<Program>();
-    options.AddOpenBehavior(typeof(ValidationBehavior<,>));
 
+    cfg.RegisterServicesFromAssemblyContaining<Program>();
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
 });
 
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
