@@ -66,7 +66,7 @@ public static class Endpoints
         return TypedResults.Created();
     }
 
-    private static async Task<IResult> UpdateUser(ISender sender, [FromRoute] string id, [FromForm] UpdateUserData data)
+    private static async Task<IResult> UpdateUser(ISender sender, [FromRoute] string id, [FromBody] UpdateUserData data)
     {
         var command = new UpdateUserCommand(id, data);
 
