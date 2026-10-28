@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Dto;
 using TodoApp.ApiService.Repository;
+using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
 
@@ -14,13 +15,18 @@ public class GetTodosQueryHandler(TodoContext db, UserRepository userRepository)
     {
 
         var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
+        var isAdmin = userRepository.Role == Role.Admin;
 
-        return await db
+        var query = db
           .Todos
           .Skip(request.Page * pageSize)
           .Take(pageSize)
           .OrderBy(t => t.LastUpdateDate)
-          .Where(t => t.OwnerId == userId)
+          .AsNoTracking();
+
+        if (!isAdmin) query = query.Where(t => t.OwnerId == userId);
+
+        return await query
           .ProjectToType<TodoDto>()
           .AsNoTracking()
           .ToListAsync(cancellationToken: cancellationToken);
