@@ -59,7 +59,7 @@ public class ExceptionHandlingMiddleware
                 Title = "Not Found"
             };
 
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
