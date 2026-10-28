@@ -1,14 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Repository;
+using TodoApp.Domain.Entity;
 using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Commands.DeleteTodo;
 
-public class DeleteTodoHandler(TodoContext db, UserRepository userRepository): IRequestHandler<DeleteTodoCommand>
+public class DeleteTodoHandler(TodoContext db, UserRepository userRepository) : IRequestHandler<DeleteTodoCommand>
 {
-  public async Task Handle(DeleteTodoCommand request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteTodoCommand request, CancellationToken cancellationToken)
     {
         var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
         var item = await db
@@ -17,7 +19,8 @@ public class DeleteTodoHandler(TodoContext db, UserRepository userRepository): I
             .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
 
         var isOwner = item.OwnerId == userId;
-        var isAdmin = item.Owner.Role == Role.Admin;
+
+        var isAdmin = userRepository.Role == Role.Admin;
         if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
         db.Remove(item);
         await db.SaveChangesAsync(cancellationToken);
