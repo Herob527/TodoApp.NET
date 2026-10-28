@@ -12,13 +12,14 @@ public class UpdateTodoHandler(TodoContext db, UserRepository userRepository): I
   {
 
       var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
+
       var item = await db
           .Todos
           .Include(t => t.Owner)
           .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
 
       var isOwner = item.OwnerId == userId;
-      var isAdmin = item.Owner.Role == Role.Admin;
+      var isAdmin = userRepository.Role == Role.Admin;
 
       if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
 
