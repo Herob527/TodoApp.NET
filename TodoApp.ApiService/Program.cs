@@ -71,7 +71,7 @@ builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
-builder.Services.AddTransient<UserRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 var app = builder.Build();
 
