@@ -5,14 +5,15 @@ namespace TodoApp.ApiService.Repository;
 
 public class UserRepository(IHttpContextAccessor accessor)
 {
+  public string? Id => Context?.FindFirstValue(ClaimTypes.NameIdentifier);
+  public string? Name => Context?.FindFirstValue(ClaimTypes.Name);
 
-  public string? Id => accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-  public string? Name => accessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
-
-  public Role Role => accessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role) switch
+  public Role Role => Context?.FindFirstValue(ClaimTypes.Role) switch
   {
-    "User" => Role.User,
-    "Admin" => Role.Admin,
-    _ => Role.User
+      "User" => Role.User,
+      "Admin" => Role.Admin,
+      _ => Role.User
   };
+
+  private ClaimsPrincipal? Context => accessor.HttpContext?.User;
 }
