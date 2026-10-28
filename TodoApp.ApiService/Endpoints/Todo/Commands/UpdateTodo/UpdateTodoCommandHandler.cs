@@ -23,7 +23,7 @@ public class UpdateTodoHandler(TodoContext db, UserRepository userRepository): I
 
       if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
 
-      item.Name = request.NewName;
+      item.Name = request.Data.Name;
       await db.SaveChangesAsync(cancellationToken);
   }
 }
