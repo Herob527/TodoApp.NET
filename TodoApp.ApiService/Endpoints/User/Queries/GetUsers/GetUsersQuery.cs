@@ -1,10 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using TodoApp.ApiService.Dto;
+using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
 
-[Authorize]
+[Authorize(Roles = nameof(Role.Admin))]
 public record GetUsersQuery(int Page): IRequest<List<UserDto>>;
 
 
