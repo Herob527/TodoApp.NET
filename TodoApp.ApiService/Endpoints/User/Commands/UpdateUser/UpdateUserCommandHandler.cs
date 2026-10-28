@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
 using TodoApp.Domain.Enum;
@@ -20,10 +19,13 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
         if (!(isAdmin || isModifyingSelf)) throw new UnauthorizedAccessException();
 
         var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
-        var isNameTaken = await userManager.Users.SingleOrDefaultAsync(x => x.UserName == request.Data.Name, cancellationToken);
-        if (isNameTaken is not null) throw new ConflictException();
 
-        user.UserName = request.Data.Name ?? user.UserName;
+        if (request.Data.Name is not null) {
+          var isNameTaken = await userManager.FindByNameAsync(request.Data.Name);
+          if (isNameTaken is not null) throw new ConflictException();
+          user.UserName = request.Data.Name;
+        }
+
         if (isAdmin && !isModifyingSelf) {
           user.Role = request.Data.Role ?? user.Role;
         }
