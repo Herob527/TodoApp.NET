@@ -26,8 +26,10 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
           user.UserName = request.Data.Name;
         }
 
-        if (isAdmin && !isModifyingSelf) {
-          user.Role = request.Data.Role ?? user.Role;
+        if (request.Data.Role is not null && isAdmin && !isModifyingSelf) {
+          var currentRole = await userManager.GetRolesAsync(user);
+          await userManager.RemoveFromRoleAsync(user, string.Join(", ", currentRole));
+          await userManager.AddToRoleAsync(user, string.Join(", ", request.Data.Role));
         }
         await userManager.UpdateAsync(user);
     }

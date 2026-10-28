@@ -22,7 +22,6 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
         var result = await userManager.CreateAsync(new ApplicationUser
         {
             UserName = request.Name,
-            Role = Role.User
         }, request.Password);
 
         Console.WriteLine(result);
@@ -32,8 +31,10 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
         }
 
 
-        var createdUser = await userManager.Users.SingleAsync(x => x.UserName == request.Name, cancellationToken: cancellationToken);
-        await userManager.AddClaimAsync(createdUser, new Claim("role", "User"));
-        await signInManager.SignInAsync(createdUser, false);
+        var createdUser = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
+
+        await userManager.AddToRoleAsync(createdUser, nameof(Role.User));
+
+        await signInManager.SignInAsync(createdUser, true);
     }
 }
