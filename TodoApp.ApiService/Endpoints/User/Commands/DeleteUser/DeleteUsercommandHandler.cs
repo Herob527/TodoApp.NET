@@ -11,9 +11,12 @@ public class DeleteUsercommandHandler(UserManager<ApplicationUser> userManager, 
 {
     public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
+      if (userRepository.Id == request.Id) throw new UnauthorizedAccessException();
+
       var isCurrentAdmin = userRepository.Role == Role.Admin;
 
       if (!isCurrentAdmin) throw new UnauthorizedAccessException();
+
 
       var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
       await userManager.DeleteAsync(user);
