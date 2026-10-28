@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
@@ -21,6 +22,7 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
         var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
 
         if (request.Data.Name is not null) {
+          // For some reason, it doesn't request name, but normalized name which is uppercase
           var isNameTaken = await userManager.FindByNameAsync(request.Data.Name);
           if (isNameTaken is not null) throw new ConflictException();
           user.UserName = request.Data.Name;
@@ -31,7 +33,11 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
           await userManager.RemoveFromRoleAsync(user, string.Join(", ", currentRole));
           await userManager.AddToRoleAsync(user, string.Join(", ", request.Data.Role));
         }
-        await userManager.UpdateAsync(user);
+        var result = await userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            throw new BadHttpRequestException("Invalid data");
+        }
     }
 }
 
