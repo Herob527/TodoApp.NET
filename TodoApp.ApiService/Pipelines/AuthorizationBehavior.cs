@@ -1,0 +1,95 @@
+using System.Reflection;
+using System.Security.Claims;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using TodoApp.ApiService.Authorization;
+using TodoApp.Domain.Entity;
+
+namespace TodoApp.ApiService.Pipelines;
+
+public class AuthorizationBehavior<TRequest, TResponse>(
+    IHttpContextAccessor httpContextAccessor,
+    UserManager<ApplicationUser> userManager,
+    ILogger<AuthorizationBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+{
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    {
+        var requestType = typeof(TRequest);
+        var httpContext = httpContextAccessor.HttpContext;
+
+        if (requestType.GetCustomAttribute<AllowAnonymousAttribute>() != null)
+        {
+            return await next(cancellationToken);
+        }
+
+        if (httpContext?.User?.Identity?.IsAuthenticated != true)
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var user = await userManager.GetUserAsync(httpContext.User) ?? throw new UnauthorizedAccessException();
+
+        var roles = await userManager.GetRolesAsync(user);
+        var claims = await userManager.GetClaimsAsync(user);
+
+        logger.LogInformation("User claims: {claims}", string.Join(", ", claims));
+
+        var userRoles = roles.ToList();
+        foreach (var claim in claims.Where(c => c.Type == "role" || c.Type == ClaimTypes.Role))
+        {
+            if (!userRoles.Contains(claim.Value))
+            {
+                userRoles.Add(claim.Value);
+            }
+        }
+        logger.LogInformation("User roles: {UserRoles}", string.Join(", ", userRoles));
+
+        if (httpContext.User != null)
+        {
+            foreach (var claim in httpContext.User.Claims.Where(c => c.Type == "role" || c.Type == ClaimTypes.Role))
+            {
+                if (!userRoles.Contains(claim.Value))
+                {
+                    userRoles.Add(claim.Value);
+                }
+            }
+        }
+
+        var roleAttribute = requestType.GetCustomAttribute<AuthorizeRoleAttribute>();
+        if (roleAttribute != null)
+        {
+            var requiredRole = roleAttribute.Policy;
+            if (string.IsNullOrEmpty(requiredRole) && !string.IsNullOrEmpty(roleAttribute.Roles))
+            {
+                requiredRole = roleAttribute.Roles;
+            }
+
+            if (string.IsNullOrEmpty(requiredRole) || !userRoles.Contains(requiredRole))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return await next(cancellationToken);
+        }
+
+        var authorizeAttribute = requestType.GetCustomAttribute<AuthorizeAttribute>();
+        if (authorizeAttribute != null)
+        {
+            if (!string.IsNullOrEmpty(authorizeAttribute.Roles))
+            {
+                var requiredRoles = authorizeAttribute.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (!requiredRoles.Any(userRoles.Contains))
+                {
+                    throw new UnauthorizedAccessException();
+                }
+            }
+
+            return await next(cancellationToken);
+        }
+
+        return await next(cancellationToken);
+    }
+}
