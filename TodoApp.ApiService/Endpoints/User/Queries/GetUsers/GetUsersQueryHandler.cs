@@ -14,9 +14,9 @@ public class GetUsersQueryHandler(UserManager<ApplicationUser> userManager) : IR
     public async Task<List<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         return await userManager.Users
+          .OrderBy(x => x.Id)
           .Skip(request.Page * pageSize)
           .Take(pageSize)
-          .OrderBy(x => x.Id)
           .ProjectToType<UserDto>()
           .AsNoTracking()
           .ToListAsync(cancellationToken);
