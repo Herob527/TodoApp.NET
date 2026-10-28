@@ -30,7 +30,7 @@ public static class Endpoints
         }
     }
 
-    private static async Task<IResult> GetUser(ISender sender, [FromRoute] int id)
+    private static async Task<IResult> GetUser(ISender sender, [FromRoute] string id)
     {
         var query = new GetUserQuery(id);
         return TypedResults.Ok(await sender.Send(query));
