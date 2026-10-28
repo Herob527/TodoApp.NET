@@ -10,6 +10,7 @@ using TodoApp.ApiService.Middlewares;
 using TodoApp.ApiService.Pipelines;
 using TodoApp.ApiService.Repository;
 using TodoApp.Domain.Entity;
+using TodoApp.Domain.Enum;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddIdentityCore<ApplicationUser>()
 
 builder.Services.AddAuthorizationBuilder();
 
-foreach (var role in Enum.GetValues<TodoApp.Domain.Enum.Role>())
+foreach (var role in Enum.GetValues<Role>())
 {
     builder.Services.AddAuthorizationBuilder().AddPolicy(role.ToString(), policy => 
     {
@@ -107,5 +108,20 @@ app.MapGet("/antiforgery/token", (
         requestToken = tokens.RequestToken
     });
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    foreach (var role in Enum.GetValues<Role>())
+    {
+        var roleName = role.ToString();
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+}
+
 
 app.Run();
