@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService;
+using TodoApp.ApiService.Pipelines;
 using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
 using TodoApp.ApiService.Repository;
@@ -15,7 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-builder.Services.AddMediatR(options => options.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddMediatR(options =>
+{
+    options.RegisterServicesFromAssemblyContaining<Program>();
+    options.AddOpenBehavior(typeof(ValidationBehavior<,>));
+
+});
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
