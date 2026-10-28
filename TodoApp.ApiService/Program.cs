@@ -30,7 +30,12 @@ builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("appdata")));
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Identity.Application";
+    options.DefaultSignInScheme = "Identity.Application";
+    options.DefaultChallengeScheme = "Identity.Application";
+})
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
         options => builder.Configuration.Bind("JwtSettings", options))
     .AddCookie("Identity.Application",
@@ -40,13 +45,16 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<TodoContext>();
 
-builder.Services.AddAuthorizationBuilder().SetDefaultPolicy(
-    new AuthorizationPolicyBuilder(
-      JwtBearerDefaults.AuthenticationScheme, "Identity.Application"
-    )
-    .RequireAuthenticatedUser()
-    .Build()
-).AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
+builder.Services.AddAuthorizationBuilder();
+
+foreach (var role in Enum.GetValues<TodoApp.Domain.Enum.Role>())
+{
+    builder.Services.AddAuthorizationBuilder().AddPolicy(role.ToString(), policy => 
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole(role.ToString());
+    });
+}
 
 
 // Add services to the container.
@@ -63,7 +71,7 @@ builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
-builder.Services.AddScoped<UserRepository>();
+builder.Services.AddTransient<UserRepository>();
 
 var app = builder.Build();
 
@@ -75,7 +83,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseAntiforgery();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapDefaultEndpoints();
 
