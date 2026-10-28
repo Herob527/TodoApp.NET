@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,10 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
         {
           throw new NotFoundException();
         }
+
+
         var createdUser = await userManager.Users.SingleAsync(x => x.UserName == request.Name, cancellationToken: cancellationToken);
+        await userManager.AddClaimAsync(createdUser, new Claim("role", "User"));
         await signInManager.SignInAsync(createdUser, false);
     }
 }
