@@ -1,9 +1,3 @@
-
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
-using Aspire.Hosting;
-using TodoApp.Contracts.Dto;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Fixtures;
 
