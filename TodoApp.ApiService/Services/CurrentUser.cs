@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using TodoApp.Domain.Enum;
 
-namespace TodoApp.ApiService.Repository;
+namespace TodoApp.ApiService.Services;
 
 public class CurrentUser(IHttpContextAccessor accessor)
 {

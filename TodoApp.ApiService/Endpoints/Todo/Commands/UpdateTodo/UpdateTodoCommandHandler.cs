@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TodoApp.ApiService.Repository;
+using TodoApp.ApiService.Services;
 using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
 

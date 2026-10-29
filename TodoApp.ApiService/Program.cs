@@ -8,7 +8,7 @@ using TodoApp.ApiService.Endpoints.Todo;
 using TodoApp.ApiService.Endpoints.User;
 using TodoApp.ApiService.Middlewares;
 using TodoApp.ApiService.Pipelines;
-using TodoApp.ApiService.Repository;
+using TodoApp.ApiService.Services;
 using TodoApp.Domain.Entity;
 using TodoApp.Domain.Enum;
 
