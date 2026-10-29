@@ -1,8 +1,5 @@
 namespace TodoApp.Domain.Entity;
 
-using TodoApp.Domain.Enum;
-
-
 public record Todo
 {
   public int Id { get; init; }
