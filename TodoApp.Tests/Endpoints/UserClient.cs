@@ -9,12 +9,6 @@ public record UserClient(HttpClient Client)
     {
         return Client.PostAsJsonAsync( $"{Base}/register", new { Name, Password });
     }
-
-    public string Login => $"{Base}/login";
-
-  public string Logout => $"{Base}/logout";
-
-  public string Create => $"{Base}";
 }
 
 
