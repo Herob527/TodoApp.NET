@@ -3,7 +3,7 @@ using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Services;
 
-public class CurrentUser(IHttpContextAccessor accessor)
+public record CurrentUser(IHttpContextAccessor Accessor)
 {
   public string? Id => Context?.FindFirstValue(ClaimTypes.NameIdentifier);
   public string? Name => Context?.FindFirstValue(ClaimTypes.Name);
@@ -15,5 +15,5 @@ public class CurrentUser(IHttpContextAccessor accessor)
       _ => Role.User
   };
 
-  private ClaimsPrincipal? Context => accessor.HttpContext?.User;
+  private ClaimsPrincipal? Context => Accessor.HttpContext?.User;
 }
