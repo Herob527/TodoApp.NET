@@ -9,8 +9,7 @@ namespace TodoApp.ApiService.Pipelines;
 
 public class AuthorizationBehavior<TRequest, TResponse>(
     IHttpContextAccessor httpContextAccessor,
-    UserManager<ApplicationUser> userManager,
-    ILogger<AuthorizationBehavior<TRequest, TResponse>> logger)
+    UserManager<ApplicationUser> userManager)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -33,8 +32,6 @@ public class AuthorizationBehavior<TRequest, TResponse>(
 
         var roles = await userManager.GetRolesAsync(user);
         var claims = await userManager.GetClaimsAsync(user);
-
-        logger.LogInformation("User claims: {claims}", string.Join(", ", claims));
 
         var userRoles = roles.ToList();
         foreach (var claim in claims.Where(c => c.Type == "role" || c.Type == ClaimTypes.Role))
