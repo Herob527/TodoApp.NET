@@ -2,7 +2,7 @@ using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.ApiService.Services;
-using TodoApp.Domain.Dto;
+using TodoApp.Contracts.Dto;
 using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;

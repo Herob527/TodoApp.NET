@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Identity;
-
-namespace TodoApp.Domain.Dto;
+namespace TodoApp.Contracts.Dto;
 
 public record UserDto
 {

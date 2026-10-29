@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Aspire.Hosting;
-using TodoApp.Domain.Dto;
+using TodoApp.Contracts.Dto;
 
 namespace TodoApp.Tests.Tests;
 

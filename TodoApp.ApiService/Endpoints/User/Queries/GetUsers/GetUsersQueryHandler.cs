@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TodoApp.Domain.Dto;
+using TodoApp.Contracts.Dto;
 using TodoApp.Domain.Entity;
 
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
