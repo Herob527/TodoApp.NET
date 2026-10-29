@@ -1,24 +1,31 @@
 
+using Microsoft.Extensions.Configuration;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder
       .AddPostgres("db")
-      .WithContainerName("todo-db")
-      .WithDataVolume("appdata")
-      .AddDatabase("appdata");
+      .WithContainerName("todo-db");
+
+if (builder.Configuration.GetValue("UseVolumes", true)) {
+  postgres.WithDataVolume("appdata");
+}
+
+var db = postgres
+    .AddDatabase("appdata");
 
 var migrations = builder
       .AddProject<Projects.TodoApp_MigrationService>("migrations")
-      .WithReference(postgres)
-      .WaitFor(postgres);
+      .WithReference(db)
+      .WaitFor(db);
 
 var apiService = builder
     .AddProject<Projects.TodoApp_ApiService>("apiservice")
     .WithHttpHealthCheck("/health")
-    .WithReference(postgres)
+    .WithReference(db)
     .WithReference(migrations)
     .WaitForCompletion(migrations)
-    .WaitFor(postgres);
+    .WaitFor(db);
 
 builder.AddProject<Projects.TodoApp_Web>("webfrontend")
     .WithExternalHttpEndpoints()
