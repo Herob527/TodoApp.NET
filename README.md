@@ -40,7 +40,7 @@ Come to think of it, Jira is advanced todo list with collaboration
 
 ## Patterns
 
-I've used know previously CQRS.
+I've used known CQRS.
 
 I've taken a glimpse of Controller-based API and it felt for some reason wrong perhaps due to first exposure with .NET having CQRS.
 
