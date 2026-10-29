@@ -1,44 +1,56 @@
+
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Aspire.Hosting;
 using TodoApp.Contracts.Dto;
+using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
 
-public class TodoIntegrationTest(AppHostFixture appHostFixture) : IClassFixture<AppHostFixture>
+public class TodoIntegrationTest : IAsyncLifetime
 {
-    private AppHostFixture AppHostFixture { get; } = appHostFixture;
+    private AppHostFixture _fixture = null!;
 
-    private DistributedApplication App => AppHostFixture.App;
-    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+    private HttpClient _httpClient = null!;
 
+    private TodoClient _todoClient = null!;
+
+    private UserClient _userClient = null!;
+
+    private static readonly TimeSpan DefaultTimeout =
+        TimeSpan.FromSeconds(30);
+
+    public async Task InitializeAsync()
+    {
+        _fixture = await AppHostFixture.CreateAsync();
+
+        await _fixture
+            .App
+            .StartAsync()
+            .WaitAsync(DefaultTimeout);
+
+        _httpClient = _fixture.App.CreateHttpClient("apiservice");
+        _todoClient = new TodoClient(_httpClient);
+        _userClient = new UserClient(_httpClient);
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _fixture.DisposeAsync();
+    }
 
     [Fact]
     public async Task RegisterUserAndCreateIsSuccessful()
     {
-        // Arrange
-        var cancellationToken = CancellationToken.None;
+        var registerResponse = await _userClient.RegisterUser("testingasd", "zaq1@WSX");
+        var createTodoResponse = await _todoClient.CreateAsync("testing2");
+        var getTodosResponse = await _todoClient.GetPaginatedAsync();
 
-
-        await App.StartAsync(cancellationToken)
-            .WaitAsync(DefaultTimeout, cancellationToken);
-
-        // Act
-        using var httpClient = App.CreateHttpClient("apiservice");
-
-        using var registerResponse = await httpClient.PostAsJsonAsync("/api/users/register", new { Name = "testingasd", Password = "zaq1@WSX" }, cancellationToken);
-        using var createTodoResponse = await httpClient.PostAsJsonAsync("/api/todos", new { Name = "testing2" }, cancellationToken);
-        using var getTodosResponse = await httpClient.GetAsync("/api/todos?page=0", cancellationToken);
-
-        string json = await getTodosResponse.Content.ReadAsStringAsync();
-        List<TodoDto>? converted = JsonSerializer.Deserialize<List<TodoDto>>(json);
-
-
-        // Assert
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
-        Assert.NotNull(converted);
-        Assert.Single(converted);
+        Assert.NotNull(getTodosResponse);
+        Assert.Single(getTodosResponse);
     }
 }
