@@ -44,7 +44,7 @@ public class TodoIntegrationTest : IAsyncLifetime
     [Fact]
     public async Task RegisterUserAndCreateIsSuccessful()
     {
-        var registerResponse = await _userClient.RegisterUser("testingasd", "zaq1@WSX");
+        var registerResponse = await _userClient.RegisterUserAsync("testingasd", "zaq1@WSX");
         var createTodoResponse = await _todoClient.CreateAsync("testing2");
         var getTodosResponse = await _todoClient.GetPaginatedAsync();
 

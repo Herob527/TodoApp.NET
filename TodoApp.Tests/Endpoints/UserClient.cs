@@ -5,7 +5,7 @@ public record UserClient(HttpClient Client)
 {
 
   private readonly string Base = "/api/users";
-    public Task<HttpResponseMessage> RegisterUser(string Name, string Password)
+    public Task<HttpResponseMessage> RegisterUserAsync(string Name, string Password)
     {
         return Client.PostAsJsonAsync( $"{Base}/register", new { Name, Password });
     }
