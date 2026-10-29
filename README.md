@@ -1,8 +1,10 @@
 # Todo App
 
-This is a simple todo app using [aspire](https://github.com/aspire-apps/aspire).
+This is a simple todo app with auth written in .NET using [aspire](https://github.com/aspire-apps/aspire).
 
-It's goal is mainly to make .NET app by myself instead of relying on existing patterns from previous job.
+Previously I was using docker compose as goto, but I've decided that why not check out Aspire for setting up deps instead.
+
+It's goal is to make .NET fullstack app by myself instead of relying on existing patterns from previous job.
 
 I've decided to use auth to test, what is possible in .NET speaking of auth.
 
@@ -10,6 +12,10 @@ And my goal is learn testing in .NET as well.
 
 Gotta say, .NET Identity, while it provides basis for auth, it requires more setup to avoid excessive database SELECT queries.
 
+I kinda get, why we used Firebase instead of .NET Identity for auth and setup own user tables.
+
 Currently, backend seems to work when testing via postman.
 
 After making sure it works via tests, I think I'll set up simple website via blazor.
+
+ChatGPT was quite helpful with this project to figure out some patterns.
