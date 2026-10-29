@@ -1,16 +1,31 @@
+
 using Aspire.Hosting;
 
 namespace TodoApp.Tests.Fixtures;
 
-public class AppHostFixture : IAsyncDisposable
+public sealed class AppHostFixture : IAsyncDisposable
 {
     public DistributedApplication App { get; }
-    public AppHostFixture() {
 
-        var builder = DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.TodoApp_AppHost>(["UseVolumes=false"]).Result;
-        App = builder.Build();
-  }
+    private AppHostFixture(DistributedApplication app)
+    {
+        App = app;
+    }
 
-    public async ValueTask DisposeAsync() => await App.DisposeAsync();
+    public static async Task<AppHostFixture> CreateAsync()
+    {
+        var builder =
+            await DistributedApplicationTestingBuilder
+                .CreateAsync<Projects.TodoApp_AppHost>(
+                    ["UseVolumes=false"]);
+
+        var app = builder.Build();
+
+        return new AppHostFixture(app);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await App.DisposeAsync();
+    }
 }
