@@ -8,7 +8,7 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, UserRepository userRepository) : IRequestHandler<UpdateUserCommand>
+public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, CurrentUser userRepository) : IRequestHandler<UpdateUserCommand>
 
 {
     public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)

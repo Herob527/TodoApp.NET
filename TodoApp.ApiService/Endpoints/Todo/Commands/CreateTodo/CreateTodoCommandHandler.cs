@@ -3,7 +3,7 @@ using TodoApp.ApiService.Repository;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Commands.CreateTodo;
 
-public class CreateTodoHandler(TodoContext db, UserRepository user) : IRequestHandler<CreateTodoCommand>
+public class CreateTodoHandler(TodoContext db, CurrentUser user) : IRequestHandler<CreateTodoCommand>
 {
     public async Task Handle(CreateTodoCommand request, CancellationToken cancellationToken)
     {

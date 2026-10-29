@@ -7,7 +7,7 @@ using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
 
-public class GetTodosQueryHandler(TodoContext db, UserRepository userRepository): IRequestHandler<GetTodosQuery, List<TodoDto>>
+public class GetTodosQueryHandler(TodoContext db, CurrentUser userRepository): IRequestHandler<GetTodosQuery, List<TodoDto>>
 {
     const int pageSize = 10;
 

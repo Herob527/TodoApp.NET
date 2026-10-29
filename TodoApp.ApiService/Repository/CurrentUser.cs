@@ -3,7 +3,7 @@ using TodoApp.Domain.Enum;
 
 namespace TodoApp.ApiService.Repository;
 
-public class UserRepository(IHttpContextAccessor accessor)
+public class CurrentUser(IHttpContextAccessor accessor)
 {
   public string? Id => Context?.FindFirstValue(ClaimTypes.NameIdentifier);
   public string? Name => Context?.FindFirstValue(ClaimTypes.Name);

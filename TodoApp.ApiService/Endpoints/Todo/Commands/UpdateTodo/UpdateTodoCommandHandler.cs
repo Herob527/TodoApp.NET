@@ -6,7 +6,7 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Commands.UpdateTodo;
 
-public class UpdateTodoHandler(TodoContext db, UserRepository userRepository): IRequestHandler<UpdateTodoCommand>
+public class UpdateTodoHandler(TodoContext db, CurrentUser userRepository): IRequestHandler<UpdateTodoCommand>
 {
   public async Task Handle(UpdateTodoCommand request, CancellationToken cancellationToken)
   {

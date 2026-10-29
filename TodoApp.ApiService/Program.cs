@@ -72,7 +72,7 @@ builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
-builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<CurrentUser>();
 
 var app = builder.Build();
 

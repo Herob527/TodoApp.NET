@@ -6,7 +6,7 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Commands.DeleteTodo;
 
-public class DeleteTodoHandler(TodoContext db, UserRepository userRepository) : IRequestHandler<DeleteTodoCommand>
+public class DeleteTodoHandler(TodoContext db, CurrentUser userRepository) : IRequestHandler<DeleteTodoCommand>
 {
     public async Task Handle(DeleteTodoCommand request, CancellationToken cancellationToken)
     {
