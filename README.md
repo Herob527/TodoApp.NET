@@ -46,6 +46,5 @@ I've taken a glimpse of Controller-based API and it felt for some reason wrong p
 
 ## TODO
 
-[ ] Integration tests
-
-[ ] Blazor frontend
+- [ ] Integration tests
+- [ ] Blazor frontend
