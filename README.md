@@ -48,3 +48,4 @@ I've taken a glimpse of Controller-based API and it felt for some reason wrong p
 
 - [ ] Integration tests
 - [ ] Blazor frontend
+- [ ] Currently when running integration tests, I cannot have aspire app ran so to fix
