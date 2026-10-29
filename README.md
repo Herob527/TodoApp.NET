@@ -4,7 +4,7 @@ This is a simple todo app with auth written in .NET using [aspire](https://githu
 
 Previously I was using docker compose as goto, but I've decided that why not check out Aspire for setting up deps instead.
 
-It's goal is to make .NET fullstack app by myself instead of relying on existing patterns from previous job.
+My goal is to make .NET fullstack app by myself instead of relying on existing patterns from previous job.
 
 I've decided to use auth to test, what is possible in .NET speaking of auth.
 
