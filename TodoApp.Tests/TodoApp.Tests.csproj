@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -7,31 +6,28 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.Testing" Version="13.6.4" />
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.6.4"></PackageReference>
     <PackageReference Include="coverlet.collector" Version="10.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0"></PackageReference>
+    <PackageReference Include="xunit" Version="2.9.3"></PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
-    <Using Include="System.Net" />
-    <Using Include="Microsoft.Extensions.DependencyInjection" />
-    <Using Include="Aspire.Hosting.ApplicationModel" />
-    <Using Include="Aspire.Hosting.Testing" />
-    <Using Include="Xunit" />
+    <Using Include="System.Net"></Using>
+    <Using Include="Microsoft.Extensions.DependencyInjection"></Using>
+    <Using Include="Aspire.Hosting.ApplicationModel"></Using>
+    <Using Include="Aspire.Hosting.Testing"></Using>
+    <Using Include="Xunit"></Using>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\TodoApp.AppHost\TodoApp.AppHost.csproj" />
+    <ProjectReference Include="..\TodoApp.AppHost\TodoApp.AppHost.csproj"></ProjectReference>
+    <ProjectReference Include="..\TodoApp.Domain\TodoApp.Domain.csproj"></ProjectReference>
   </ItemGroup>
-
 </Project>
