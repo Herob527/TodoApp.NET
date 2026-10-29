@@ -24,7 +24,7 @@ public class TodoIntegrationTest : IAsyncLifetime
 
 
     [Fact]
-    public async Task GetWebResourceRootReturnsOkStatusCode()
+    public async Task RegisterUserAndCreateIsSuccessful()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -48,6 +48,6 @@ public class TodoIntegrationTest : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
         Assert.NotNull(converted);
-        Assert.NotEmpty(converted);
+        Assert.Single(converted);
     }
 }
