@@ -2,7 +2,7 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TodoApp.ApiService.Dto;
+using TodoApp.Domain.Dto;
 using TodoApp.Domain.Entity;
 using TodoApp.Domain.Exceptions;
 

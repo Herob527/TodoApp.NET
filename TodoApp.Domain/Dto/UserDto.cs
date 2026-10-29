@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace TodoApp.ApiService.Dto;
+namespace TodoApp.Domain.Dto;
 
 public record UserDto
 {

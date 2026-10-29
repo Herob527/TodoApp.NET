@@ -1,5 +1,5 @@
 using MediatR;
-using TodoApp.ApiService.Dto;
+using TodoApp.Domain.Dto;
 
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUser;
 public record GetUserQuery(string Id): IRequest<UserDto>;

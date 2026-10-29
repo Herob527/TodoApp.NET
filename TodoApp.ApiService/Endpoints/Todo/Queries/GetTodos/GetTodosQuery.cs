@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using TodoApp.ApiService.Dto;
+using TodoApp.Domain.Dto;
 
 namespace TodoApp.ApiService.Endpoints.Todo.Queries.GetTodos;
 
