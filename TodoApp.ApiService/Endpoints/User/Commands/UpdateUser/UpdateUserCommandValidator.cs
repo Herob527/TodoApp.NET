@@ -6,8 +6,8 @@ public class UpdateUserCommandValidator: AbstractValidator<UpdateUserCommand>
   public UpdateUserCommandValidator()
   {
     RuleFor(x => x.Id).NotEmpty();
-    RuleFor(x => x.Data.Name).MinimumLength(3).MaximumLength(40);
-    RuleFor(x => x.Data.Role).IsInEnum();
+    When(x => x.Data.Name is not null, () => RuleFor(x => x.Data.Name).NotEmpty().MinimumLength(3).MaximumLength(40)) ;
+    When(x => x.Data.Role is not null, () => RuleFor(x => x.Data.Role).IsInEnum());
   }
 }
 
