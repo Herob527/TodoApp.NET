@@ -10,7 +10,7 @@ My goal is to make .NET fullstack app mostly by myself instead of relying on exi
 
 I've decided to use auth to test, what is possible in .NET speaking of auth.
 
-Gotta say, .NET Identity, while it provides basis for auth, it requires more setup to avoid excessive database SELECT queries.
+Gotta say, .NET Identity, while it provides basis for auth, it requires more setup to avoid excessive fetching fields in SELECT queries.
 
 I kinda get, why we used Firebase instead of .NET Identity for auth and setup own user tables.
 
