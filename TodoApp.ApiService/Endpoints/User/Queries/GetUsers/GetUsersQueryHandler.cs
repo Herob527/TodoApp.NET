@@ -7,20 +7,30 @@ using TodoApp.Domain.Entity;
 
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
 
-public class GetUsersQueryHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<GetUsersQuery, List<UserDto>>
+public class GetUsersQueryHandler(
+    TodoContext dbContext)
+    : IRequestHandler<GetUsersQuery, List<UserDto>>
 {
+    private const int PageSize = 10;
 
-    const int pageSize = 10;
-    public async Task<List<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
-    {
-        return await userManager.Users
-          .OrderBy(x => x.Id)
-          .Skip(request.Page * pageSize)
-          .Take(pageSize)
-          .ProjectToType<UserDto>()
-          .AsNoTracking()
-          .ToListAsync(cancellationToken);
-    }
+    public async Task<List<UserDto>> Handle(
+        GetUsersQuery request,
+        CancellationToken cancellationToken) => await dbContext.Users
+        .OrderBy(x => x.Id)
+        .Skip(request.Page * PageSize)
+        .Take(PageSize)
+        .Select(user => new UserDto
+        {
+            Id = user.Id,
+            UserName = user.UserName!,
+            Roles = (
+                from userRole in dbContext.UserRoles
+                join role in dbContext.Roles
+                    on userRole.RoleId equals role.Id
+                where userRole.UserId == user.Id
+                select role.Name!
+            ).ToList()
+        })
+        .AsNoTracking()
+        .ToListAsync(cancellationToken);
 }
-
-
