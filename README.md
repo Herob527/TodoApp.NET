@@ -9,3 +9,7 @@ I've decided to use auth to test, what is possible in .NET speaking of auth.
 And my goal is learn testing in .NET as well.
 
 Gotta say, .NET Identity, while it provides basis for auth, it requires more setup to avoid excessive database SELECT queries.
+
+Currently, backend seems to work when testing via postman.
+
+After making sure it works via tests, I think I'll set up simple website via blazor.
