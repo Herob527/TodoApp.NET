@@ -1,18 +1,9 @@
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using Aspire.Hosting;
+using TodoApp.Domain.Dto;
 
 namespace TodoApp.Tests.Tests;
-
-public record TodoDto
-{
-    public int Id { get; init; }
-    public string Name { get; init; }
-    public bool IsComplete { get; init; }
-    public DateTime CreationDate { get; init; }
-    public DateTime LastUpdateDate { get; init; }
-}
 
 public class TodoIntegrationTest : IAsyncLifetime
 {
