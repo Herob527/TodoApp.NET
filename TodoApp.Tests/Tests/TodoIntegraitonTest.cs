@@ -30,7 +30,7 @@ public class TodoIntegrationTest : IAsyncLifetime
         var cancellationToken = CancellationToken.None;
 
 
-        await _app.StartAsync( cancellationToken)
+        await _app.StartAsync(cancellationToken)
             .WaitAsync(DefaultTimeout, cancellationToken);
 
         // Act
