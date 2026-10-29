@@ -2,25 +2,16 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Aspire.Hosting;
 using TodoApp.Contracts.Dto;
+using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
 
-public class TodoIntegrationTest : IAsyncLifetime
+public class TodoIntegrationTest(AppHostFixture appHostFixture) : IClassFixture<AppHostFixture>
 {
+    private AppHostFixture AppHostFixture { get; } = appHostFixture;
+
+    private DistributedApplication App => AppHostFixture.App;
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
-
-    private DistributedApplication _app;
-
-    public async Task InitializeAsync()
-    {
-        var builder = await DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.TodoApp_AppHost>(["UseVolumes=false"]);
-
-
-        _app = await builder.BuildAsync();
-    }
-
-    public async Task DisposeAsync() => await _app.DisposeAsync();
 
 
     [Fact]
@@ -30,11 +21,11 @@ public class TodoIntegrationTest : IAsyncLifetime
         var cancellationToken = CancellationToken.None;
 
 
-        await _app.StartAsync(cancellationToken)
+        await App.StartAsync(cancellationToken)
             .WaitAsync(DefaultTimeout, cancellationToken);
 
         // Act
-        using var httpClient = _app.CreateHttpClient("apiservice");
+        using var httpClient = App.CreateHttpClient("apiservice");
 
         using var registerResponse = await httpClient.PostAsJsonAsync("/api/users/register", new { Name = "testingasd", Password = "zaq1@WSX" }, cancellationToken);
         using var createTodoResponse = await httpClient.PostAsJsonAsync("/api/todos", new { Name = "testing2" }, cancellationToken);
