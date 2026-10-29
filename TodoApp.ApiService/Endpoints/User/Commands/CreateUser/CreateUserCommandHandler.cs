@@ -17,16 +17,17 @@ public class CreateUserCommandHandler(UserManager<ApplicationUser> userManager) 
             throw new ConflictException();
         }
 
-        var result = await userManager.CreateAsync(new ApplicationUser
+        ApplicationUser user = new()
         {
             UserName = request.Name,
-        }, request.Password);
+        };
+
+        var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded) throw new HttpRequestException();
 
-        var createdUser = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
 
-        await userManager.AddToRoleAsync(createdUser, request.Role.ToString());
+        await userManager.AddToRoleAsync(user, request.Role.ToString());
 
     }
 }
