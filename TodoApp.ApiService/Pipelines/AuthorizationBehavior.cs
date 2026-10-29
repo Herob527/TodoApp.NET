@@ -44,7 +44,6 @@ public class AuthorizationBehavior<TRequest, TResponse>(
                 userRoles.Add(claim.Value);
             }
         }
-        logger.LogInformation("User roles: {UserRoles}", string.Join(", ", userRoles));
 
         if (httpContext.User != null)
         {
