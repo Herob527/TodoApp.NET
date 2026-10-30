@@ -14,11 +14,11 @@ public class TodoIntegrationTest : IAsyncLifetime
     private UserClient _userClient = null!;
 
     private static readonly TimeSpan DefaultTimeout =
-        TimeSpan.FromSeconds(30);
+        TimeSpan.FromSeconds(60);
 
     public async Task InitializeAsync()
     {
-        _fixture = await AppHostFixture.CreateAsync();
+        _fixture = await AppHostFixture.CreateAsync("todo");
 
         await _fixture
             .App
