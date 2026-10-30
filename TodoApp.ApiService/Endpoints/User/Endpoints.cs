@@ -8,6 +8,7 @@ using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUserMe;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUser;
+using TodoApp.ApiService.Endpoints.User.Queries.GetUserMe;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
 
 namespace TodoApp.ApiService.Endpoints.User;
@@ -22,6 +23,7 @@ public static class Endpoints
               .MapGroup("/api/users")
               .WithTags("Users");
 
+            group.MapGet("/me", GetUserMe);
             group.MapGet("/{id}", GetUser);
             group.MapGet("/", GetUsers);
             group.MapPost("/", CreateUser);
@@ -37,6 +39,12 @@ public static class Endpoints
     private static async Task<IResult> GetUser(ISender sender, [FromRoute] string id)
     {
         var query = new GetUserQuery(id);
+        return TypedResults.Ok(await sender.Send(query));
+    }
+
+    private static async Task<IResult> GetUserMe(ISender sender)
+    {
+        var query = new GetUserMeQuery();
         return TypedResults.Ok(await sender.Send(query));
     }
 
