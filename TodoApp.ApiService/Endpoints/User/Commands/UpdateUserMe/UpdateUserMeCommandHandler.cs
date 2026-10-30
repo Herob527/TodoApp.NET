@@ -1,9 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
 using TodoApp.ApiService.Services;
 using TodoApp.Domain.Entity;
-using TodoApp.Domain.Enum;
 using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.UpdateUserMe;
