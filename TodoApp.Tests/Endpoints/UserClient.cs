@@ -19,6 +19,11 @@ public record UserClient(HttpClient Client)
     {
         return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name });
     }
+
+    public Task<HttpResponseMessage> UpdateSelfAsync(string Name)
+    {
+        return Client.PatchAsJsonAsync($"{Base}/me", new { Name });
+    }
     public Task<HttpResponseMessage> LogoutUserAsync()
     {
         return Client.PostAsync($"{Base}/logout", null);
