@@ -9,6 +9,15 @@ public record UserClient(HttpClient Client)
     {
         return Client.PostAsJsonAsync( $"{Base}/register", new { Name, Password });
     }
+
+    public Task<HttpResponseMessage> LoginUser(string Name, string Password)
+    {
+        return Client.PostAsJsonAsync($"{Base}/login", new { Name, Password });
+    }
+    public Task<HttpResponseMessage> LogoutUser()
+    {
+        return Client.PostAsync($"{Base}/logout", null);
+    }
 }
 
 
