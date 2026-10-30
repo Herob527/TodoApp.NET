@@ -3,9 +3,11 @@ using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+var containerName = builder.Configuration.GetValue("DBContainerName", "todo-db");
+
 var postgres = builder
       .AddPostgres("db")
-      .WithContainerName("todo-db");
+      .WithContainerName(containerName);
 
 if (builder.Configuration.GetValue("UseVolumes", true)) {
   postgres.WithDataVolume("appdata");
