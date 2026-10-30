@@ -6,6 +6,7 @@ using TodoApp.ApiService.Endpoints.User.Commands.LoginUser;
 using TodoApp.ApiService.Endpoints.User.Commands.LogoutUser;
 using TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 using TodoApp.ApiService.Endpoints.User.Commands.UpdateUser;
+using TodoApp.ApiService.Endpoints.User.Commands.UpdateUserMe;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUser;
 using TodoApp.ApiService.Endpoints.User.Queries.GetUsers;
 
@@ -28,6 +29,7 @@ public static class Endpoints
             group.MapPost("/login", LoginUser);
             group.MapPost("/logout", LogoutUser);
             group.MapPatch("/{id}", UpdateUser);
+            group.MapPatch("/me", UpdateUserMe);
             group.MapDelete("/{id}", DeleteUser);
         }
     }
@@ -63,13 +65,19 @@ public static class Endpoints
     private static async Task<IResult> LoginUser(ISender sender, [FromBody] LoginUserCommand command)
     {
         await sender.Send(command);
-        return TypedResults.Created();
+        return TypedResults.Ok();
     }
 
     private static async Task<IResult> UpdateUser(ISender sender, [FromRoute] string id, [FromBody] UpdateUserData data)
     {
         var command = new UpdateUserCommand(id, data);
 
+        await sender.Send(command);
+        return TypedResults.Ok();
+    }
+
+    private static async Task<IResult> UpdateUserMe(ISender sender, [FromBody] UpdateUserMeCommand command)
+    {
         await sender.Send(command);
         return TypedResults.Ok();
     }
