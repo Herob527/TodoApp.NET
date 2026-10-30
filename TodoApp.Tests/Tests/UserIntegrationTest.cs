@@ -70,9 +70,12 @@ public class UserIntegrationTest : IAsyncLifetime
         const string newName = "testing4";
         var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
         var updateResponse = await _userClient.UpdateSelfAsync(newName);
+        var getMeResponse = await _userClient.GetUserMeAsync();
 
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        Assert.NotNull(getMeResponse);
+        Assert.Equal(newName, getMeResponse.UserName);
     }
 }
