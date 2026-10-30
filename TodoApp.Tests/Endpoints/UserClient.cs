@@ -14,10 +14,13 @@ public record UserClient(HttpClient Client)
     {
         return Client.PostAsJsonAsync($"{Base}/login", new { Name, Password });
     }
+
+    public Task<HttpResponseMessage> UpdateUser(string Id, string Name)
+    {
+        return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name });
+    }
     public Task<HttpResponseMessage> LogoutUser()
     {
         return Client.PostAsync($"{Base}/logout", null);
     }
 }
-
-

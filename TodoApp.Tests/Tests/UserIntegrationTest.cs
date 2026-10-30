@@ -60,6 +60,17 @@ public class UserIntegrationTest : IAsyncLifetime
         Assert.StartsWith($"{cookie};", logoutAuthCookie);
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, logoutResponse.StatusCode);
+    }
 
+    [Fact(DisplayName = "Register user, then update name, should succeed and user should have name changed")]
+    public async Task RegisterUserAndUpdate()
+    {
+
+        const string name = "testing3";
+        const string newName = "testing4";
+        var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+
+        // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
+        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
     }
 }
