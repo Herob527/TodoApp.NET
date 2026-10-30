@@ -32,13 +32,34 @@ public class UserIntegrationTest : IAsyncLifetime
         await _fixture.DisposeAsync();
     }
 
-    [Fact]
+    [Fact(DisplayName = "Register same user twice, first should be created, second should be conflict")]
     public async Task RegisterSameUserTwiceIsConflict()
     {
-        var firstResponse = await _userClient.RegisterUserAsync("testingasd", "zaq1@WSX");
-        var secondResponse = await _userClient.RegisterUserAsync("testingasd", "zaq1@WSX");
+        const string name = "alamakota";
+        var firstResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        var secondResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
 
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+    }
+
+    [Fact(DisplayName = "Register user, then logout, should succeed and user should not be logged in")]
+    public async Task RegisterUserAndLogout()
+    {
+
+        const string name = "testing";
+        const string cookie =  ".AspNetCore.Identity.Application=";
+        var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        var logoutResponse = await _userClient.LogoutUser();
+
+        var registerAuthCookie = registerResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
+        var logoutAuthCookie = logoutResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
+
+        // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
+        Assert.False(registerAuthCookie.StartsWith( $"{cookie};"));
+        Assert.StartsWith($"{cookie};", logoutAuthCookie);
+        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, logoutResponse.StatusCode);
+
     }
 }
