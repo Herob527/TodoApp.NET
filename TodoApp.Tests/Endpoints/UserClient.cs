@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using TodoApp.Contracts.Dto;
 
 namespace TodoApp.Tests.Endpoints;
 public record UserClient(HttpClient Client)
@@ -27,5 +28,10 @@ public record UserClient(HttpClient Client)
     public Task<HttpResponseMessage> LogoutUserAsync()
     {
         return Client.PostAsync($"{Base}/logout", null);
+    }
+
+    public Task<UserDto?> GetUserMeAsync()
+    {
+        return Client.GetFromJsonAsync<UserDto>($"{Base}/me");
     }
 }
