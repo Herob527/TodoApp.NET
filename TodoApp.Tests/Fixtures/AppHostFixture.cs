@@ -12,12 +12,12 @@ public sealed class AppHostFixture : IAsyncDisposable
         App = app;
     }
 
-    public static async Task<AppHostFixture> CreateAsync()
+    public static async Task<AppHostFixture> CreateAsync(string containerName)
     {
         var builder =
             await DistributedApplicationTestingBuilder
                 .CreateAsync<Projects.TodoApp_AppHost>(
-                    ["UseVolumes=false"]);
+                    ["UseVolumes=false", $"DBContainerName={containerName}"]);
 
         var app = builder.Build();
 
