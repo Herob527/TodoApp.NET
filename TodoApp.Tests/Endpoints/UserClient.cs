@@ -10,16 +10,16 @@ public record UserClient(HttpClient Client)
         return Client.PostAsJsonAsync( $"{Base}/register", new { Name, Password });
     }
 
-    public Task<HttpResponseMessage> LoginUser(string Name, string Password)
+    public Task<HttpResponseMessage> LoginUserAsync(string Name, string Password)
     {
         return Client.PostAsJsonAsync($"{Base}/login", new { Name, Password });
     }
 
-    public Task<HttpResponseMessage> UpdateUser(string Id, string Name)
+    public Task<HttpResponseMessage> UpdateUserAsync(string Id, string Name)
     {
         return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name });
     }
-    public Task<HttpResponseMessage> LogoutUser()
+    public Task<HttpResponseMessage> LogoutUserAsync()
     {
         return Client.PostAsync($"{Base}/logout", null);
     }
