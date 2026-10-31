@@ -21,7 +21,5 @@ public sealed class LoginFixture : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await _userClient.LogoutUserAsync();
-
-        GC.SuppressFinalize(this);
     }
 }
