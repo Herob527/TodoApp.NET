@@ -54,7 +54,7 @@ public class TodoIntegrationTest : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
     public async Task CreateTodoValidationFail()
     {
 
