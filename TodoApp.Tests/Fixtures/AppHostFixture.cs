@@ -1,5 +1,6 @@
 
 using Aspire.Hosting;
+using TodoApp.Tests.Data;
 
 namespace TodoApp.Tests.Fixtures;
 
@@ -17,7 +18,7 @@ public sealed class AppHostFixture : IAsyncDisposable
         var builder =
             await DistributedApplicationTestingBuilder
                 .CreateAsync<Projects.TodoApp_AppHost>(
-                    ["UseVolumes=false", $"DBContainerName={containerName}", "AdminUser=Admin"]);
+                    ["UseVolumes=false", $"DBContainerName={containerName}", $"AdminUser={AdminUser.Name}", $"AdminPassword={AdminUser.Password}"]);
 
         var app = builder.Build();
 

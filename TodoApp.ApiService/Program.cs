@@ -99,6 +99,7 @@ app.MapUserEndpoints();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
     foreach (var role in Enum.GetValues<Role>())
     {
@@ -109,16 +110,21 @@ using (var scope = app.Services.CreateScope())
         }
     }
     var adminUser = builder.WebHost.GetSetting("AdminUser");
-    if (!string.IsNullOrEmpty(adminUser))
+    var adminPassword = builder.WebHost.GetSetting("AdminPassword");
+    if (!string.IsNullOrEmpty(adminUser) && !string.IsNullOrEmpty(adminPassword))
     {
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var user = await userManager.FindByNameAsync(adminUser);
         if (user == null)
         {
             user = new ApplicationUser { UserName = adminUser };
-            await userManager.CreateAsync(user);
+            var result = await userManager.CreateAsync(user, adminPassword);
+            if (!result.Succeeded)
+            {
+                result.Errors.ToList().ForEach(error => Console.WriteLine(error.Description));
+                throw new Exception("Failed to create admin user");
+            }
+            await userManager.AddToRoleAsync(user, nameof(Role.Admin));
         }
-        await userManager.AddToRoleAsync(user, nameof(Role.Admin));
     }
 
 }

@@ -5,6 +5,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var containerName = builder.Configuration.GetValue("DBContainerName", "todo-db");
 var adminUser = builder.Configuration.GetValue("AdminUser", "");
+var adminPassword = builder.Configuration.GetValue("AdminPassword", "");
 
 var postgres = builder
       .AddPostgres("db")
@@ -25,7 +26,7 @@ var migrations = builder
 
 var apiService = builder
     .AddProject<Projects.TodoApp_ApiService>("apiservice")
-    .WithArgs([$"AdminUser={adminUser}"])
+    .WithArgs([$"AdminUser={adminUser}", $"AdminPassword={adminPassword}"])
     .WithHttpHealthCheck("/health")
     .WithReference(db)
     .WithReference(migrations)
