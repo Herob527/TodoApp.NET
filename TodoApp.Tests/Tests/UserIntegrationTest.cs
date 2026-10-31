@@ -50,8 +50,9 @@ public class UserIntegrationTest : IAsyncLifetime
 
         const string name = "testing";
         const string cookie =  ".AspNetCore.Identity.Application=";
-        var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
-        var loginResponse = await _userClient.LoginUserAsync(name, "zaq1@WSX");
+        const string password = "zaq1@WSX";
+        var registerResponse = await _userClient.RegisterUserAsync(name, password);
+        var loginResponse = await _userClient.LoginUserAsync(name, password);
         var logoutResponse = await _userClient.LogoutUserAsync();
 
         var loginAuthCookie = loginResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
