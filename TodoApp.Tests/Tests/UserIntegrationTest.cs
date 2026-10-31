@@ -36,8 +36,9 @@ public class UserIntegrationTest : IAsyncLifetime
     public async Task RegisterSameUserTwiceIsConflict()
     {
         const string name = "alamakota";
-        var firstResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
-        var secondResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        const string password = "zaq1@WSX";
+        var firstResponse = await _userClient.RegisterUserAsync(name, password);
+        var secondResponse = await _userClient.RegisterUserAsync(name, password);
 
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
