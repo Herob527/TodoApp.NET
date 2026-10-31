@@ -38,7 +38,6 @@ public class UserIntegrationTest : IAsyncLifetime
         const string name = "alamakota";
         var firstResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
         var secondResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
-        await _userClient.LogoutUserAsync();
 
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
@@ -75,8 +74,10 @@ public class UserIntegrationTest : IAsyncLifetime
 
         const string name = "testing3";
         const string newName = "testing4";
-        var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
-        var loginResponse = await _userClient.LoginUserAsync(name, "zaq1@WSX");
+        const string password = "zaq1@WSX";
+        var registerResponse = await _userClient.RegisterUserAsync(name, password);
+
+        var loginResponse = await _userClient.LoginUserAsync(name, password);
         var updateResponse = await _userClient.UpdateSelfAsync(newName);
         var getMeResponse = await _userClient.GetUserMeAsync();
 
