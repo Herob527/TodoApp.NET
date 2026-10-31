@@ -2,17 +2,8 @@ using TodoApp.Tests.Endpoints;
 
 namespace TodoApp.Tests.Fixtures;
 
-public sealed class LoginFixture : IAsyncDisposable
+public sealed record LoginFixture(UserClient UserClient, string Name) : IAsyncDisposable
 {
-    private readonly UserClient _userClient;
-    private readonly string _name;
-
-    private LoginFixture(UserClient userClient, string name)
-    {
-        _userClient = userClient;
-        _name = name;
-    }
-
     public static async Task<LoginFixture> CreateAsync(
         UserClient userClient,
         string name,
@@ -33,7 +24,6 @@ public sealed class LoginFixture : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        Console.WriteLine($"Test: Logging out user {_name}");
-        await _userClient.LogoutUserAsync();
+        await UserClient.LogoutUserAsync();
     }
 }
