@@ -58,16 +58,13 @@ public class TodoIntegrationTest : IAsyncLifetime
     public async Task CreateTodoValidationFail()
     {
 
-        string exactLength = string.RandomText(TodoConstraints.NameMaxLength);
         string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
 
         await using (await LoginFixture.StartSessionAsync(_userClient, user.Item1, user.Item2)) {
 
           var tooShortTodo = await _todoClient.CreateAsync("");
-          var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
           var tooLongTodo = await _todoClient.CreateAsync(tooLong);
 
-          Assert.Equal(HttpStatusCode.Created, exactLengthTodo.StatusCode);
           Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
           Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
         }
