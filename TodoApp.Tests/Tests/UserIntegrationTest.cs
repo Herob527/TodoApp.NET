@@ -53,10 +53,6 @@ public class UserIntegrationTest : IAsyncLifetime
         var loginResponse = await _userClient.LoginUserAsync(name, "zaq1@WSX");
         var logoutResponse = await _userClient.LogoutUserAsync();
 
-        foreach (var cookief in loginResponse.Headers.GetValues("Set-Cookie")) {
-          Console.WriteLine(cookief);
-
-        }
         var loginAuthCookie = loginResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
         var logoutAuthCookie = logoutResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
 
