@@ -13,7 +13,7 @@ public record UserClient(HttpClient Client)
 
     public Task<HttpResponseMessage> LoginUserAsync(string Name, string Password)
     {
-        return Client.PostAsJsonAsync($"{Base}/login", new { Name, Password });
+        return Client.PutAsJsonAsync($"{Base}/login", new { Name, Password });
     }
 
     public Task<HttpResponseMessage> UpdateUserAsync(string Id, string Name)
