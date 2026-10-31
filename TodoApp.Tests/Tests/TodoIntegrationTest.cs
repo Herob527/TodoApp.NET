@@ -65,7 +65,6 @@ public class TodoIntegrationTest : IAsyncLifetime
         var tooShortTodo = await _todoClient.CreateAsync("");
         var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
         var tooLongTodo = await _todoClient.CreateAsync(tooLong);
-        var getTodosResponse = await _todoClient.GetPaginatedAsync();
         await _userClient.LogoutUserAsync();
 
         Assert.Equal(HttpStatusCode.Created, exactLengthTodo.StatusCode);
