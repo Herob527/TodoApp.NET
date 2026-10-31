@@ -78,7 +78,7 @@ public class TodoIntegrationTest : IAsyncLifetime
     {
 
         string firstUserTodo = string.RandomText(10);
-        string secondUserDto = string.RandomText(10);
+        string secondUserTodo = string.RandomText(10);
 
         string firstUserName = string.RandomText(10);
         string secondUserName = string.RandomText(10);
@@ -97,7 +97,7 @@ public class TodoIntegrationTest : IAsyncLifetime
 
         await using (await LoginFixture.CreateAsync(_userClient, secondUserName, password, register: true))
         {
-            var todo = await _todoClient.CreateAsync(secondUserDto);
+            var todo = await _todoClient.CreateAsync(secondUserTodo);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
             users[secondUserName].AddRange(getTodosResponse!);
         }
@@ -106,6 +106,6 @@ public class TodoIntegrationTest : IAsyncLifetime
         Assert.Single(users[secondUserName]);
 
         Assert.Equal(firstUserTodo, users[firstUserName][0].Name);
-        Assert.Equal(secondUserDto, users[secondUserName][0].Name);
+        Assert.Equal(secondUserTodo, users[secondUserName][0].Name);
     }
 }
