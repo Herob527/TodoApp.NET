@@ -44,31 +44,32 @@ public class TodoIntegrationTest : IAsyncLifetime
     [Fact]
     public async Task CreateTodoSuccessful()
     {
-        await _userClient.LoginUserAsync(user.Item1, user.Item2);
-        var createTodoResponse = await _todoClient.CreateAsync("testing2");
-        var getTodosResponse = await _todoClient.GetPaginatedAsync();
-        await _userClient.LogoutUserAsync();
+        await using (await LoginFixture.StartSessionAsync(_userClient, user.Item1, user.Item2)) {
+          var createTodoResponse = await _todoClient.CreateAsync("testing2");
+          var getTodosResponse = await _todoClient.GetPaginatedAsync();
 
-        Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
-        Assert.NotNull(getTodosResponse);
-        Assert.Single(getTodosResponse);
+          Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
+          Assert.NotNull(getTodosResponse);
+          Assert.Single(getTodosResponse);
+        }
     }
 
     [Fact]
     public async Task CreateTodoValidationFail()
     {
 
-        await _userClient.LoginUserAsync(user.Item1, user.Item2);
-
         string exactLength = string.RandomText(TodoConstraints.NameMaxLength);
         string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
-        var tooShortTodo = await _todoClient.CreateAsync("");
-        var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
-        var tooLongTodo = await _todoClient.CreateAsync(tooLong);
-        await _userClient.LogoutUserAsync();
 
-        Assert.Equal(HttpStatusCode.Created, exactLengthTodo.StatusCode);
-        Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
-        Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
+        await using (await LoginFixture.StartSessionAsync(_userClient, user.Item1, user.Item2)) {
+
+          var tooShortTodo = await _todoClient.CreateAsync("");
+          var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
+          var tooLongTodo = await _todoClient.CreateAsync(tooLong);
+
+          Assert.Equal(HttpStatusCode.Created, exactLengthTodo.StatusCode);
+          Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
+          Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
+        }
     }
 }
