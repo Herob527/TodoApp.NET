@@ -38,6 +38,7 @@ public class UserIntegrationTest : IAsyncLifetime
         const string name = "alamakota";
         var firstResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
         var secondResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        await _userClient.LogoutUserAsync();
 
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
@@ -50,15 +51,21 @@ public class UserIntegrationTest : IAsyncLifetime
         const string name = "testing";
         const string cookie =  ".AspNetCore.Identity.Application=";
         var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        var loginResponse = await _userClient.LoginUserAsync(name, "zaq1@WSX");
         var logoutResponse = await _userClient.LogoutUserAsync();
 
-        var registerAuthCookie = registerResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
+        foreach (var cookief in loginResponse.Headers.GetValues("Set-Cookie")) {
+          Console.WriteLine(cookief);
+
+        }
+        var loginAuthCookie = loginResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
         var logoutAuthCookie = logoutResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
 
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
-        Assert.False(registerAuthCookie.StartsWith( $"{cookie};"));
+        Assert.False(loginAuthCookie.StartsWith( $"{cookie};"));
         Assert.StartsWith($"{cookie};", logoutAuthCookie);
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, logoutResponse.StatusCode);
     }
 
@@ -69,11 +76,13 @@ public class UserIntegrationTest : IAsyncLifetime
         const string name = "testing3";
         const string newName = "testing4";
         var registerResponse = await _userClient.RegisterUserAsync(name, "zaq1@WSX");
+        var loginResponse = await _userClient.LoginUserAsync(name, "zaq1@WSX");
         var updateResponse = await _userClient.UpdateSelfAsync(newName);
         var getMeResponse = await _userClient.GetUserMeAsync();
 
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.NotNull(getMeResponse);
         Assert.Equal(newName, getMeResponse.UserName);
