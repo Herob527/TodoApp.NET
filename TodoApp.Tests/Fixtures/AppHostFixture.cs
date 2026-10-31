@@ -17,7 +17,7 @@ public sealed class AppHostFixture : IAsyncDisposable
         var builder =
             await DistributedApplicationTestingBuilder
                 .CreateAsync<Projects.TodoApp_AppHost>(
-                    ["UseVolumes=false", $"DBContainerName={containerName}"]);
+                    ["UseVolumes=false", $"DBContainerName={containerName}", "AdminUser=Admin"]);
 
         var app = builder.Build();
 
