@@ -1,3 +1,4 @@
+using TodoApp.Contracts.Validation;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Fixtures;
 
@@ -16,6 +17,9 @@ public class TodoIntegrationTest : IAsyncLifetime
     private static readonly TimeSpan DefaultTimeout =
         TimeSpan.FromSeconds(60);
 
+    private (string, string) user = ("testingasd", "zaq1@WSX");
+
+
     public async Task InitializeAsync()
     {
         _fixture = await AppHostFixture.CreateAsync("todo");
@@ -28,6 +32,7 @@ public class TodoIntegrationTest : IAsyncLifetime
         _httpClient = _fixture.App.CreateHttpClient("apiservice");
         _todoClient = new TodoClient(_httpClient);
         _userClient = new UserClient(_httpClient);
+        await _userClient.RegisterUserAsync(user.Item1, user.Item2);
     }
 
     public async Task DisposeAsync()
@@ -36,15 +41,40 @@ public class TodoIntegrationTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RegisterUserAndCreateIsSuccessful()
+    public async Task CreateTodoSuccessful()
     {
-        var registerResponse = await _userClient.RegisterUserAsync("testingasd", "zaq1@WSX");
+        await _userClient.LoginUserAsync(user.Item1, user.Item2);
         var createTodoResponse = await _todoClient.CreateAsync("testing2");
         var getTodosResponse = await _todoClient.GetPaginatedAsync();
+        await _userClient.LogoutUserAsync();
 
-        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
         Assert.NotNull(getTodosResponse);
         Assert.Single(getTodosResponse);
+    }
+
+    [Fact]
+    public async Task CreateTodoValidationFail()
+    {
+
+        await _userClient.LoginUserAsync(user.Item1, user.Item2);
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        string exactLength = new(
+            [.. Enumerable.Repeat(chars, TodoConstraints.NameMaxLength).Select(s => s[random.Next(s.Length)])]
+        );
+        string tooLong = new(
+            [.. Enumerable.Repeat(chars, TodoConstraints.NameMaxLength + 1).Select(s => s[random.Next(s.Length)])]
+        );
+        var tooShortTodo = await _todoClient.CreateAsync("");
+        var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
+        var tooLongTodo = await _todoClient.CreateAsync(tooLong);
+        var getTodosResponse = await _todoClient.GetPaginatedAsync();
+        await _userClient.LogoutUserAsync();
+
+        Assert.Equal(HttpStatusCode.Created, exactLengthTodo.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
     }
 }
