@@ -85,6 +85,5 @@ public class UserIntegrationTest : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.NotNull(getMeResponse);
         Assert.Equal(newName, getMeResponse.UserName);
-
     }
 }
