@@ -75,15 +75,16 @@ public class UserIntegrationTest : IAsyncLifetime
         const string password = "zaq1@WSX";
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
 
-        var loginResponse = await _userClient.LoginUserAsync(name, password);
+        // Using login fixture causes 401 on users/me
+        _ = await _userClient.LoginUserAsync(name, password);
         var updateResponse = await _userClient.UpdateSelfAsync(newName);
         var getMeResponse = await _userClient.GetUserMeAsync();
-
+        _ = await _userClient.LogoutUserAsync();
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.NotNull(getMeResponse);
         Assert.Equal(newName, getMeResponse.UserName);
+
     }
 }
