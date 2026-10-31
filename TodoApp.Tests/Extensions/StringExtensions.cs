@@ -2,16 +2,13 @@ namespace TodoApp.Tests.Extensions;
 public static class StringExtensions
 {
 
-  const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  private static readonly Random Random = Random.Shared;
 
   extension(string) {
-
     public static string RandomText(int length) {
-
-        var random = new Random();
-
         return new(
-            [.. Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)])]
+            [.. Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)])]
         );
     }
 
