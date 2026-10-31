@@ -41,7 +41,7 @@ public class TodoIntegrationTest : IAsyncLifetime
         await _fixture.DisposeAsync();
     }
 
-    [Fact]
+    [Fact(DisplayName = "Create valid todo item, it should response with created with one item in list")]
     public async Task CreateTodoSuccessful()
     {
         await using (await LoginFixture.StartSessionAsync(_userClient, user.Item1, user.Item2)) {
