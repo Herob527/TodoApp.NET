@@ -7,7 +7,7 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) : IRequestHandler<RegisterUserCommand>
+public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<RegisterUserCommand>
 {
     public async Task Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
@@ -33,7 +33,5 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
         var createdUser = await userManager.FindByNameAsync(request.Name) ?? throw new NotFoundException();
 
         await userManager.AddToRoleAsync(createdUser, nameof(Role.User));
-
-        await signInManager.SignInAsync(createdUser, true);
     }
 }
