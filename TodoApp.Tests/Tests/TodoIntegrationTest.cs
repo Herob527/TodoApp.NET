@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using TodoApp.Contracts.Dto;
 using TodoApp.Contracts.Validation;
 using TodoApp.Tests.Endpoints;
@@ -46,13 +45,14 @@ public class TodoIntegrationTest : IAsyncLifetime
     public async Task CreateTodoSuccessful()
     {
 
-        await using (new LoginFixture(_userClient, string.RandomText(10), password, Register: true)) {
-          var createTodoResponse = await _todoClient.CreateAsync("testing2");
-          var getTodosResponse = await _todoClient.GetPaginatedAsync();
+        await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
+        {
+            var createTodoResponse = await _todoClient.CreateAsync("testing2");
+            var getTodosResponse = await _todoClient.GetPaginatedAsync();
 
-          Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
-          Assert.NotNull(getTodosResponse);
-          Assert.Single(getTodosResponse);
+            Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
+            Assert.NotNull(getTodosResponse);
+            Assert.Single(getTodosResponse);
         }
     }
 
@@ -62,18 +62,15 @@ public class TodoIntegrationTest : IAsyncLifetime
 
         string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
 
-        Console.WriteLine("Test: Before using");
-        await using (new LoginFixture(_userClient, string.RandomText(10), password, Register: true)) {
+        await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
+        {
 
-          Console.WriteLine("Test: Performing validations");
-          var tooShortTodo = await _todoClient.CreateAsync("");
-          var tooLongTodo = await _todoClient.CreateAsync(tooLong);
-          Console.WriteLine("Test: Validations done");
+            var tooShortTodo = await _todoClient.CreateAsync("");
+            var tooLongTodo = await _todoClient.CreateAsync(tooLong);
 
-          Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
-          Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
         }
-        Console.WriteLine("Test: After using");
     }
 
     [Fact(DisplayName = "Create todos as separate users, each user gets own todos")]
@@ -86,21 +83,23 @@ public class TodoIntegrationTest : IAsyncLifetime
         string firstUserName = string.RandomText(10);
         string secondUserName = string.RandomText(10);
 
-        Dictionary<string, List<TodoDto>>  users = [];
+        Dictionary<string, List<TodoDto>> users = [];
 
         users.Add(firstUserName, []);
         users.Add(secondUserName, []);
 
-        await using (new LoginFixture(_userClient, firstUserName, password, Register: true)) {
-          var todo = await _todoClient.CreateAsync(firstUserTodo);
-          var getTodosResponse = await _todoClient.GetPaginatedAsync();
-          users[firstUserName].AddRange(getTodosResponse!);
+        await using (await LoginFixture.CreateAsync(_userClient, firstUserName, password, register: true))
+        {
+            var todo = await _todoClient.CreateAsync(firstUserTodo);
+            var getTodosResponse = await _todoClient.GetPaginatedAsync();
+            users[firstUserName].AddRange(getTodosResponse!);
         }
 
-        await using (new LoginFixture(_userClient, secondUserName, password, Register: true)) {
-          var todo = await _todoClient.CreateAsync(secondUserDto);
-          var getTodosResponse = await _todoClient.GetPaginatedAsync();
-          users[secondUserName].AddRange(getTodosResponse!);
+        await using (await LoginFixture.CreateAsync(_userClient, secondUserName, password, register: true))
+        {
+            var todo = await _todoClient.CreateAsync(secondUserDto);
+            var getTodosResponse = await _todoClient.GetPaginatedAsync();
+            users[secondUserName].AddRange(getTodosResponse!);
         }
 
         Assert.Single(users[firstUserName]);
