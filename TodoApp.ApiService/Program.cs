@@ -108,6 +108,19 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(roleName));
         }
     }
+    var adminUser = builder.WebHost.GetSetting("AdminUser");
+    if (!string.IsNullOrEmpty(adminUser))
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = await userManager.FindByNameAsync(adminUser);
+        if (user == null)
+        {
+            user = new ApplicationUser { UserName = adminUser };
+            await userManager.CreateAsync(user);
+        }
+        await userManager.AddToRoleAsync(user, nameof(Role.Admin));
+    }
+
 }
 
 
