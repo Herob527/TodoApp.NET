@@ -1,5 +1,6 @@
 using TodoApp.Contracts.Validation;
 using TodoApp.Tests.Endpoints;
+using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
@@ -58,15 +59,9 @@ public class TodoIntegrationTest : IAsyncLifetime
     {
 
         await _userClient.LoginUserAsync(user.Item1, user.Item2);
-        var random = new Random();
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        string exactLength = new(
-            [.. Enumerable.Repeat(chars, TodoConstraints.NameMaxLength).Select(s => s[random.Next(s.Length)])]
-        );
-        string tooLong = new(
-            [.. Enumerable.Repeat(chars, TodoConstraints.NameMaxLength + 1).Select(s => s[random.Next(s.Length)])]
-        );
+        string exactLength = string.RandomText(TodoConstraints.NameMaxLength);
+        string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
         var tooShortTodo = await _todoClient.CreateAsync("");
         var exactLengthTodo = await _todoClient.CreateAsync(exactLength);
         var tooLongTodo = await _todoClient.CreateAsync(tooLong);
