@@ -97,18 +97,6 @@ app.MapTodoEndpoints();
 
 app.MapUserEndpoints();
 
-app.MapGet("/antiforgery/token", (
-    HttpContext context,
-    IAntiforgery antiforgery) =>
-{
-    var tokens = antiforgery.GetAndStoreTokens(context);
-
-    return Results.Ok(new
-    {
-        requestToken = tokens.RequestToken
-    });
-});
-
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
