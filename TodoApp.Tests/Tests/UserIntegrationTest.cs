@@ -32,7 +32,7 @@ public class UserIntegrationTest : IAsyncLifetime
         await _fixture.DisposeAsync();
     }
 
-    [Fact(DisplayName = "Register same user twice, first should be created, second should be conflict")]
+    [Fact(DisplayName = "Register same user twice, first should be created and second should be conflict")]
     public async Task RegisterSameUserTwiceIsConflict()
     {
         const string name = "alamakota";
@@ -44,7 +44,7 @@ public class UserIntegrationTest : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
     }
 
-    [Fact(DisplayName = "Register user, then logout, should succeed and user should not be logged in")]
+    [Fact(DisplayName = "Register user and logout, should succeed and user should not be logged in")]
     public async Task RegisterUserAndLogout()
     {
 
@@ -66,7 +66,7 @@ public class UserIntegrationTest : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, logoutResponse.StatusCode);
     }
 
-    [Fact(DisplayName = "Register user, then update name, should succeed and user should have name changed")]
+    [Fact(DisplayName = "Register user as User and update name, should succeed and user should have name changed")]
     public async Task RegisterUserAndUpdate()
     {
 
