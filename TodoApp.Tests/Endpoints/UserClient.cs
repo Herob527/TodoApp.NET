@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using TodoApp.Contracts.Dto;
+using TodoApp.Domain.Enum;
 
 namespace TodoApp.Tests.Endpoints;
 public record UserClient(HttpClient Client)
@@ -16,9 +17,9 @@ public record UserClient(HttpClient Client)
         return Client.PutAsJsonAsync($"{Base}/login", new { Name, Password });
     }
 
-    public Task<HttpResponseMessage> UpdateUserAsync(string Id, string Name)
+    public Task<HttpResponseMessage> UpdateUserAsync(string Id, string? Name = null, Role? Role = null)
     {
-        return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name });
+        return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name, Role });
     }
 
     public Task<HttpResponseMessage> UpdateSelfAsync(string Name)
