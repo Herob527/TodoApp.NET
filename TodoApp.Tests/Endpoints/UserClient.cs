@@ -34,4 +34,14 @@ public record UserClient(HttpClient Client)
     {
         return Client.GetFromJsonAsync<UserDto>($"{Base}/me");
     }
+
+    public Task<UserDto?> GetUserAsync(string Id)
+    {
+        return Client.GetFromJsonAsync<UserDto>($"{Base}/{Id}");
+    }
+
+    public Task<List<UserDto>?> GetUsersAsync(int page = 0)
+    {
+        return Client.GetFromJsonAsync<List<UserDto>>($"{Base}?page={page}");
+    }
 }
