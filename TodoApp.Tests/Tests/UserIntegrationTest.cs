@@ -1,4 +1,5 @@
 using TodoApp.Tests.Endpoints;
+using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
@@ -86,4 +87,22 @@ public class UserIntegrationTest : IAsyncLifetime
         Assert.NotNull(getMeResponse);
         Assert.Equal(newName, getMeResponse.UserName);
     }
+
+    [Fact(DisplayName = "Login invalid username of password, should throw not found")]
+    public async Task LoginOrPasswordInvalid_ThrowsNotFound() {
+        string realUserName = string.RandomText(10);
+        string password = string.RandomText(10);
+        string invalidUserName = string.RandomText(10);
+        string invalidPassword = string.RandomText(10);
+
+        await _userClient.RegisterUserAsync(realUserName, password);
+
+        var invalidUserResponse = await _userClient.LoginUserAsync(invalidUserName, password);
+        var invalidPassResponse = await _userClient.LoginUserAsync(realUserName, invalidPassword);
+
+        Assert.Equal(HttpStatusCode.NotFound, invalidUserResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, invalidPassResponse.StatusCode);
+
+    }
+
 }
