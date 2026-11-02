@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using TodoApp.ApiService.Services;
 using TodoApp.Domain.Entity;
@@ -20,17 +21,26 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
 
         var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
 
-        if (request.Data.Name is not null) {
-          // For some reason, it doesn't request name, but normalized name which is uppercase
-          var isNameTaken = await userManager.FindByNameAsync(request.Data.Name);
-          if (isNameTaken is not null) throw new ConflictException();
-          user.UserName = request.Data.Name;
+        if (request.Data.Name is not null)
+        {
+            // For some reason, it doesn't request name, but normalized name which is uppercase
+            var isNameTaken = await userManager.FindByNameAsync(request.Data.Name);
+            if (isNameTaken is not null) throw new ConflictException();
+            user.UserName = request.Data.Name;
         }
 
-        if (request.Data.Role is not null && isAdmin && !isModifyingSelf) {
-          var currentRole = await userManager.GetRolesAsync(user);
-          await userManager.RemoveFromRoleAsync(user, string.Join(", ", currentRole));
-          await userManager.AddToRoleAsync(user, string.Join(", ", request.Data.Role));
+        if (request.Data.Role is not null)
+        {
+            if (isAdmin && isModifyingSelf)
+            {
+                throw new BadHttpRequestException("You cannot change your own role");
+            }
+            if (isAdmin && !isModifyingSelf)
+            {
+                var currentRole = await userManager.GetRolesAsync(user);
+                await userManager.RemoveFromRoleAsync(user, string.Join(", ", currentRole));
+                await userManager.AddToRoleAsync(user, string.Join(", ", request.Data.Role));
+            }
         }
         var result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
