@@ -42,7 +42,7 @@ public class TodoIntegrationTest : IAsyncLifetime
     }
 
     [Fact(DisplayName = "Create valid todo item, it should response with created with one item in list")]
-    public async Task CreateTodoSuccessful()
+    public async Task CreateValidTodo_Successful()
     {
 
         await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
@@ -57,7 +57,7 @@ public class TodoIntegrationTest : IAsyncLifetime
     }
 
     [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
-    public async Task CreateTodoValidationFail()
+    public async Task CreateInvalidTodo_ValidationFail()
     {
 
         string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
