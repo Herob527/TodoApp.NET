@@ -1,3 +1,4 @@
+using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
@@ -102,7 +103,29 @@ public class UserIntegrationTest : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.NotFound, invalidUserResponse.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, invalidPassResponse.StatusCode);
+    }
+
+    [Fact(DisplayName = "Login as Admin and update someones name, should succeed")]
+    public async Task LoginAsAdminAndUpdateUser_ShouldSucceed()
+    {
+
+        const string name = "testing3";
+        const string newName = "testing4";
+        const string password = "zaq1@WSX";
+        var registerResponse = await _userClient.RegisterUserAsync(name, password);
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == name);
+          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, newName);
+          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+
+          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+          Assert.NotNull(getUpdatedUserResponse);
+          Assert.Equal(newName, getUpdatedUserResponse.UserName);
+        }
 
     }
+
 
 }
