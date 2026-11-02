@@ -1,5 +1,6 @@
 using TodoApp.Contracts.Dto;
 using TodoApp.Contracts.Validation;
+using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
@@ -73,7 +74,7 @@ public class TodoIntegrationTest : IAsyncLifetime
         }
     }
 
-    [Fact(DisplayName = "Create todos as separate users, each user gets own todos")]
+    [Fact(DisplayName = "Create todos as separate users, each user gets own todos and admin sees all")]
     public async Task CreateTodoAsSeparateUser()
     {
 
@@ -85,27 +86,33 @@ public class TodoIntegrationTest : IAsyncLifetime
 
         Dictionary<string, List<TodoDto>> users = [];
 
-        users.Add(firstUserName, []);
-        users.Add(secondUserName, []);
-
         await using (await LoginFixture.CreateAsync(_userClient, firstUserName, password, register: true))
         {
             var todo = await _todoClient.CreateAsync(firstUserTodo);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
-            users[firstUserName].AddRange(getTodosResponse!);
+            users.Add(firstUserName, getTodosResponse!);
         }
 
         await using (await LoginFixture.CreateAsync(_userClient, secondUserName, password, register: true))
         {
             var todo = await _todoClient.CreateAsync(secondUserTodo);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
-            users[secondUserName].AddRange(getTodosResponse!);
+            users.Add(secondUserName, getTodosResponse!);
+        }
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+            var getTodosResponse = await _todoClient.GetPaginatedAsync();
+            users.Add("admin", getTodosResponse!);
         }
 
         Assert.Single(users[firstUserName]);
         Assert.Single(users[secondUserName]);
+        Assert.Equal(2, users["admin"].Count);
 
         Assert.Equal(firstUserTodo, users[firstUserName][0].Name);
         Assert.Equal(secondUserTodo, users[secondUserName][0].Name);
+        Assert.Equal(firstUserTodo, users["admin"][0].Name);
+        Assert.Equal(secondUserTodo, users["admin"][1].Name);
     }
 }
