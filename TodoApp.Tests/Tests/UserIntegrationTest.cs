@@ -1,3 +1,4 @@
+using TodoApp.Domain.Enum;
 using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
@@ -124,8 +125,23 @@ public class UserIntegrationTest : IAsyncLifetime
           Assert.NotNull(getUpdatedUserResponse);
           Assert.Equal(newName, getUpdatedUserResponse.UserName);
         }
-
     }
 
+    [Fact(DisplayName = "Login as Admin and update own role, should fail with bad request")]
+    public async Task LoginAsAdminAndUpdateOwn_ShouldFail()
+    {
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetUsersAsync())?.First(x => x.UserName == AdminUser.Name);
+          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
+          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+
+          Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
+          // FIX: For some reason this is null
+          Assert.NotNull(getUpdatedUserResponse);
+          Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
+        }
+    }
 
 }
