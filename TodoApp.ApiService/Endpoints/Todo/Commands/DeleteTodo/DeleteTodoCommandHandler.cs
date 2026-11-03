@@ -17,9 +17,9 @@ public class DeleteTodoHandler(TodoContext db, CurrentUser userRepository) : IRe
             .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
 
         var isOwner = item.OwnerId == userId;
-
         var isAdmin = userRepository.Role == Role.Admin;
-        if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
+
+        if (!isOwner && !isAdmin) throw new UnauthorizedAccessException();
         db.Remove(item);
         await db.SaveChangesAsync(cancellationToken);
     }
