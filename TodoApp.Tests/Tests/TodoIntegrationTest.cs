@@ -124,7 +124,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             var todoList = await _todoClient.GetPaginatedAsync();
             var hasOriginal = todoList.Any(x => x.Name == todoName);
             var hasModified = todoList.Any(x => x.Name == newTodoName);
-            wasModified = hasOriginal && !hasModified;
+            wasModified = !hasOriginal && hasModified;
         }
 
         Assert.Equal(HttpStatusCode.OK, updateTodoResponse.StatusCode);
