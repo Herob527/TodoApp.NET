@@ -59,7 +59,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Fact(DisplayName = "Register user as User and update own name, should succeed and user should have name changed")]
-    public async Task RegisterUserAndUpdate()
+    public async Task RegisterUserAndUpdate_ShouldSucceed()
     {
 
         var name = string.RandomText(10);
