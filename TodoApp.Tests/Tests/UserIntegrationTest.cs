@@ -167,6 +167,22 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Login as Admin and delete yourself, should fail and user should not be deleted")]
+    public async Task LoginAsAdminAndRemoveYourself_ShouldFail()
+    {
+        var userName = string.RandomText(10);
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
+          var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
+          var getUser = await _userClient.GetUserAsync(usersList.Id);
+
+          Assert.Equal(HttpStatusCode.Conflict, deleteResponse.StatusCode);
+          Assert.NotNull(getUser);
+        }
+    }
+
     [Fact(DisplayName = "Login as User and delete other user, should throw insufficient permissions and user should not be deleted")]
     public async Task LoginAsUserAndRemoveOtherUser_ShouldFail()
     {
