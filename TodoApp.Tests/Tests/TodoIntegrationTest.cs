@@ -65,7 +65,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Delete own todo item, it should succeed and todo item be deleted ")]
+    [Fact(DisplayName = "Delete own todo item, it should succeed and todo item be deleted.")]
     public async Task DeleteOwnTodo_Successful()
     {
 
