@@ -36,7 +36,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
     }
 
-    [Fact(DisplayName = "Register user and logout, should succeed and user should not be logged in")]
+    [Fact(DisplayName = "Register as User and logout, should succeed and user should not be logged in")]
     public async Task RegisterUserAndLogout()
     {
 
@@ -167,7 +167,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Login as user and delete other user, should throw insufficient permissions and user should not be deleted")]
+    [Fact(DisplayName = "Login as User and delete other user, should throw insufficient permissions and user should not be deleted")]
     public async Task LoginAsUserAndRemoveOtherUser_ShouldFail()
     {
         var userNametoRemove = string.RandomText(10);
@@ -193,7 +193,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Login as user and update other user, should throw insufficient permissions and user should not be updated")]
+    [Fact(DisplayName = "Login as User and update other user, should throw insufficient permissions and user should not be updated")]
     public async Task LoginAsUserAndUpdateOtherUser_ShouldFail()
     {
         var userNametoUpdate = string.RandomText(10);
