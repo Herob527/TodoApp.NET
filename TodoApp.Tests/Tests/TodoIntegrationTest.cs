@@ -114,7 +114,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.False(isTodoStillThere);
     }
 
-    [Fact(DisplayName = "Delete someones todo item as User, it should fail and todo item be intackt.")]
+    [Fact(DisplayName = "Delete someones todo item as User, it should fail and todo item be intact.")]
     public async Task DeleteSomeonesTodoAsUser_ShouldFail()
     {
 
