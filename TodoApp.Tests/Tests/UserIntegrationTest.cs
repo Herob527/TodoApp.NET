@@ -192,4 +192,31 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
           Assert.NotNull(getUser);
         }
     }
+
+    [Fact(DisplayName = "Login as user and update other user, should throw insufficient permissions and user should not be updated")]
+    public async Task LoginAsUserAndUpdateOtherUser_ShouldFail()
+    {
+        var userNametoUpdate = string.RandomText(10);
+        var nonAdminUser = string.RandomText(10);
+        await _userClient.RegisterUserAsync(userNametoUpdate, "zaq1@WSX");
+        await _userClient.RegisterUserAsync(nonAdminUser, "zaq1@WSX");
+
+        UserDto? userToUpdate;
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userNametoUpdate);
+          userToUpdate = await _userClient.GetUserAsync(usersList.Id);
+        }
+
+        await using (await LoginFixture.CreateAsync(_userClient, nonAdminUser, "zaq1@WSX"))
+        {
+          var updateResponse = await _userClient.UpdateUserAsync(userToUpdate!.Id, Name: string.RandomText(10));
+          var getUser = await _userClient.GetUserAsync(userToUpdate!.Id);
+
+          Assert.Equal(HttpStatusCode.Unauthorized, updateResponse.StatusCode);
+          Assert.NotNull(getUser);
+          Assert.Equal(userToUpdate.UserName, getUser.UserName);
+        }
+    }
 }
