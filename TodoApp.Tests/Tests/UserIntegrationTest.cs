@@ -1,7 +1,5 @@
-using k8s.Autorest;
 using TodoApp.Contracts.Dto;
 using TodoApp.Domain.Enum;
-using TodoApp.Domain.Exceptions;
 using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
