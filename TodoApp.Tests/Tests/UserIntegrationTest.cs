@@ -169,7 +169,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Login as user and delete other user, should throw insufficient permissions")]
+    [Fact(DisplayName = "Login as user and delete other user, should throw insufficient permissions and user should not be deleted")]
     public async Task LoginAsUserAndRemoveOtherUser_ShouldFail()
     {
         var userNametoRemove = string.RandomText(10);
