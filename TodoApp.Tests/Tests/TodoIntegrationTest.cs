@@ -41,6 +41,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
             Assert.NotNull(getTodosResponse);
             Assert.Single(getTodosResponse);
+            Assert.Equal("testing2", getTodosResponse[0].Name);
         }
     }
 
