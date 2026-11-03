@@ -1,4 +1,3 @@
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +8,18 @@ using TodoApp.Domain.Exceptions;
 
 namespace TodoApp.ApiService.Endpoints.User.Queries.GetUserMe;
 
-public class GetUserMeQueryHandler(UserManager<ApplicationUser> userManager, CurrentUser userRepository) : IRequestHandler<GetUserMeQuery, UserDto>
+public class GetUserMeQueryHandler(UserManager<ApplicationUser> userManager, CurrentUser userRepository, TodoContext dbContext) : IRequestHandler<GetUserMeQuery, UserDto>
 {
     public async Task<UserDto> Handle(GetUserMeQuery request, CancellationToken cancellationToken)
     {
         return await userManager
             .Users
-            .ProjectToType<UserDto>()
+            .Select(user => new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                Roles = (from userRole in dbContext.UserRoles join role in dbContext.Roles on userRole.RoleId equals role.Id where userRole.UserId == user.Id select role.Name!).ToList()
+            })
             .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == userRepository.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
     }
