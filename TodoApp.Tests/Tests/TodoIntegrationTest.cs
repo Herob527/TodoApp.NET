@@ -65,6 +65,73 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Update someone's todo item as User, it should fail and todo item be intact.")]
+    public async Task UpdateSomeonesTodoAsUser_ShouldFail()
+    {
+
+        var todoName = string.RandomText(10);
+        var creatorName = string.RandomText(10);
+        var unapprovedEditorName = string.RandomText(10);
+        int todoId;
+        await using (await LoginFixture.CreateAsync(_userClient, creatorName, password, register: true))
+        {
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            todoId = initialGetTodosResponse.Id;
+        }
+        HttpResponseMessage updateTodoResponse;
+        await using (await LoginFixture.CreateAsync(_userClient, unapprovedEditorName, password, register: true))
+        {
+            updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: string.RandomText(10));
+        }
+
+        var isTodoStillThere = false;
+        await using (await LoginFixture.CreateAsync(_userClient, creatorName, password))
+        {
+            var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
+            isTodoStillThere = afterTodoResponse is not null;
+        }
+
+        Assert.Equal(HttpStatusCode.Unauthorized, updateTodoResponse.StatusCode);
+        Assert.True(isTodoStillThere);
+
+    }
+
+    [Fact(DisplayName = "Update someone's todo item as Admin, it should succeed and todo item be modified.")]
+    public async Task UpdateSomeonesTodoAsAdmin_ShouldSucceed()
+    {
+
+        var todoName = string.RandomText(10);
+        var newTodoName = string.RandomText(10);
+        var creatorName = string.RandomText(10);
+        var unapprovedEditorName = string.RandomText(10);
+        int todoId;
+        await using (await LoginFixture.CreateAsync(_userClient, creatorName, password, register: true))
+        {
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            todoId = initialGetTodosResponse.Id;
+        }
+        HttpResponseMessage updateTodoResponse;
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+            updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: newTodoName);
+        }
+
+        var wasModified = false;
+        await using (await LoginFixture.CreateAsync(_userClient, creatorName, password))
+        {
+            var todoList = await _todoClient.GetPaginatedAsync();
+            var hasOriginal = todoList.Any(x => x.Name == todoName);
+            var hasModified = todoList.Any(x => x.Name == newTodoName);
+            wasModified = hasOriginal && !hasModified;
+        }
+
+        Assert.Equal(HttpStatusCode.OK, updateTodoResponse.StatusCode);
+        Assert.True(wasModified);
+
+    }
+
     [Fact(DisplayName = "Delete own todo item, it should succeed and todo item be deleted.")]
     public async Task DeleteOwnTodo_Successful()
     {
