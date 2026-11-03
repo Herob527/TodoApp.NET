@@ -1,31 +1,31 @@
-
 using Aspire.Hosting;
 using TodoApp.Tests.Data;
 
 namespace TodoApp.Tests.Fixtures;
 
-public sealed class AppHostFixture : IAsyncDisposable
+public sealed class AppHostFixture : IAsyncLifetime
 {
-    public DistributedApplication App { get; }
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(60);
 
-    private AppHostFixture(DistributedApplication app)
-    {
-        App = app;
-    }
+    private readonly string _containerName = $"todo-tests-{Guid.NewGuid():N}";
 
-    public static async Task<AppHostFixture> CreateAsync(string containerName)
+    public DistributedApplication App { get; private set; } = null!;
+
+    public async Task InitializeAsync()
     {
         var builder =
             await DistributedApplicationTestingBuilder
                 .CreateAsync<Projects.TodoApp_AppHost>(
-                    ["UseVolumes=false", $"DBContainerName={containerName}", $"AdminUser={AdminUser.Name}", $"AdminPassword={AdminUser.Password}"]);
+                    ["UseVolumes=false", $"DBContainerName={_containerName}", $"AdminUser={AdminUser.Name}", $"AdminPassword={AdminUser.Password}"]);
 
-        var app = builder.Build();
+        App = builder.Build();
 
-        return new AppHostFixture(app);
+        await App
+            .StartAsync()
+            .WaitAsync(DefaultTimeout);
     }
 
-    public async ValueTask DisposeAsync()
+    public async Task DisposeAsync()
     {
         await App.DisposeAsync();
     }
