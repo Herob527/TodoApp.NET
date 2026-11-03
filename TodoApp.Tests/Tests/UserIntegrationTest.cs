@@ -133,12 +133,11 @@ public class UserIntegrationTest : IAsyncLifetime
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-          var usersList = (await _userClient.GetUsersAsync())?.First(x => x.UserName == AdminUser.Name);
+          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == AdminUser.Name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
           var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
           Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
-          // FIX: For some reason this is null
           Assert.NotNull(getUpdatedUserResponse);
           Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
         }
