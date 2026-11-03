@@ -29,7 +29,7 @@ public record TodoClient(HttpClient Client)
 
     public async Task<HttpResponseMessage> CreateAsync(string Name) => await Client.PostAsJsonAsync($"{Base}", new { Name });
 
-    public async Task<HttpResponseMessage> UpdateAsync(string Id, string? Name = null, bool? IsDone = null) => await Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name, IsDone });
+    public async Task<HttpResponseMessage> UpdateAsync(int Id, string? Name = null, bool? IsDone = null) => await Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name, IsDone });
 
-    public async Task<HttpResponseMessage> DeleteAsync(string Id) => await Client.DeleteAsync($"{Base}/{Id}");
+    public async Task<HttpResponseMessage> DeleteAsync(int Id) => await Client.DeleteAsync($"{Base}/{Id}");
 }
