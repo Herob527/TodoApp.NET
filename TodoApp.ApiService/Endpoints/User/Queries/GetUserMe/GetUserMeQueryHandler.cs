@@ -14,13 +14,13 @@ public class GetUserMeQueryHandler(UserManager<ApplicationUser> userManager, Cur
     {
         return await userManager
             .Users
+            .AsNoTracking()
             .Select(user => new UserDto
             {
                 Id = user.Id,
                 UserName = user.UserName!,
                 Roles = (from userRole in dbContext.UserRoles join role in dbContext.Roles on userRole.RoleId equals role.Id where userRole.UserId == user.Id select role.Name!).ToList()
             })
-            .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == userRepository.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
     }
 }
