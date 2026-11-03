@@ -83,6 +83,68 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Delete someones todo item as Admin, it should succeed and todo item be removed.")]
+    public async Task DeleteSomeonesTodoAsAdmin_ShouldSucceed()
+    {
+
+        int todoIdToRemove;
+        var ownerOfTodo = string.RandomText(10);
+        var todoName = string.RandomText(10);
+        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, password, register: true))
+        {
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            todoIdToRemove = initialGetTodosResponse.Id;
+        }
+
+        HttpResponseMessage deleteTodoResponse;
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+            deleteTodoResponse = await _todoClient.DeleteAsync(todoIdToRemove);
+        }
+
+        bool isTodoStillThere = false;
+        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, password))
+        {
+            var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
+            isTodoStillThere = afterTodoResponse is not null;
+        }
+
+        Assert.Equal(HttpStatusCode.OK, deleteTodoResponse.StatusCode);
+        Assert.False(isTodoStillThere);
+    }
+
+    [Fact(DisplayName = "Delete someones todo item as User, it should fail and todo item be intackt.")]
+    public async Task DeleteSomeonesTodoAsUser_ShouldFail()
+    {
+
+        int todoIdToRemove;
+        var ownerOfTodo = string.RandomText(10);
+        var todoName = string.RandomText(10);
+        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, password, register: true))
+        {
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            todoIdToRemove = initialGetTodosResponse.Id;
+        }
+
+        HttpResponseMessage deleteTodoResponse;
+        await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
+        {
+            deleteTodoResponse = await _todoClient.DeleteAsync(todoIdToRemove);
+        }
+
+        bool isTodoStillThere = false;
+        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, password))
+        {
+            var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
+            isTodoStillThere = afterTodoResponse is not null;
+        }
+
+        Assert.Equal(HttpStatusCode.Unauthorized, deleteTodoResponse.StatusCode);
+        Assert.True(isTodoStillThere);
+    }
+
     [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
     public async Task CreateInvalidTodo_ValidationFail()
     {
