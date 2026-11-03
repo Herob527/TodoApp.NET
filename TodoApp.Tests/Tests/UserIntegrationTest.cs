@@ -160,11 +160,37 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userName);
-          var updateResponse = await _userClient.DeleteUserAsync(usersList.Id);
-          var httpException = await Assert.ThrowsAsync<HttpRequestException>(async () => await _userClient.GetUserAsync(usersList.Id));
+          var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
+          var getUserException = await Assert.ThrowsAsync<HttpRequestException>(async () => await _userClient.GetUserAsync(usersList.Id));
 
-          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-          Assert.Equal(HttpStatusCode.NotFound, httpException.StatusCode);
+          Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+          Assert.Equal(HttpStatusCode.NotFound, getUserException.StatusCode);
+        }
+    }
+
+    [Fact(DisplayName = "Login as user and delete other user, should throw insufficient permissions")]
+    public async Task LoginAsUserAndRemoveOtherUser_ShouldFail()
+    {
+        var userNametoRemove = string.RandomText(10);
+        var nonAdminUser = string.RandomText(10);
+        await _userClient.RegisterUserAsync(userNametoRemove, "zaq1@WSX");
+        await _userClient.RegisterUserAsync(nonAdminUser, "zaq1@WSX");
+
+        UserDto? userToRemove;
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == nonAdminUser);
+          userToRemove = await _userClient.GetUserAsync(usersList.Id);
+        }
+
+        await using (await LoginFixture.CreateAsync(_userClient, nonAdminUser, "zaq1@WSX"))
+        {
+          var deleteResponse = await _userClient.DeleteUserAsync(userToRemove!.Id);
+          var getUser = await _userClient.GetUserAsync(userToRemove!.Id);
+
+          Assert.Equal(HttpStatusCode.Unauthorized, deleteResponse.StatusCode);
+          Assert.NotNull(getUser);
         }
     }
 }
