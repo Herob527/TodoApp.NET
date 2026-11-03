@@ -58,7 +58,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(HttpStatusCode.OK, logoutResponse.StatusCode);
     }
 
-    [Fact(DisplayName = "Register user as User and update name, should succeed and user should have name changed")]
+    [Fact(DisplayName = "Register user as User and update own name, should succeed and user should have name changed")]
     public async Task RegisterUserAndUpdate()
     {
 
