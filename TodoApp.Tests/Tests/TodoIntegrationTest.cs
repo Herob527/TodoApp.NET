@@ -70,6 +70,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
 
         var todoName = string.RandomText(10);
+        var newTodoName = string.RandomText(10);
         var creatorName = string.RandomText(10);
         var unapprovedEditorName = string.RandomText(10);
         int todoId;
@@ -82,18 +83,20 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         HttpResponseMessage updateTodoResponse;
         await using (await LoginFixture.CreateAsync(_userClient, unapprovedEditorName, password, register: true))
         {
-            updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: string.RandomText(10));
+            updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: newTodoName);
         }
 
-        var isTodoStillThere = false;
+        var wasModified = false;
         await using (await LoginFixture.CreateAsync(_userClient, creatorName, password))
         {
-            var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
-            isTodoStillThere = afterTodoResponse is not null;
+            var todoList = await _todoClient.GetPaginatedAsync();
+            var hasOriginal = todoList.Any(x => x.Name == todoName);
+            var hasModified = todoList.Any(x => x.Name == newTodoName);
+            wasModified = !hasOriginal && hasModified;
         }
 
         Assert.Equal(HttpStatusCode.Unauthorized, updateTodoResponse.StatusCode);
-        Assert.True(isTodoStillThere);
+        Assert.False(wasModified);
 
     }
 
