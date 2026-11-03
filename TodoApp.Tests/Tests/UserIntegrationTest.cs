@@ -143,4 +143,22 @@ public class UserIntegrationTest : IAsyncLifetime
         }
     }
 
+    [Fact(DisplayName = "Login as Admin and promote someones role to admin, should succeed")]
+    public async Task LoginAsAdminAndPromoteOtherUser_ShouldSucceed()
+    {
+        var userName = string.RandomText(10);
+        await _userClient.RegisterUserAsync(userName, "zaq1@WSX");
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == userName);
+          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.Admin);
+          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+
+          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+          Assert.NotNull(getUpdatedUserResponse);
+          Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
+        }
+    }
+
 }
