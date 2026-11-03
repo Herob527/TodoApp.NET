@@ -1,4 +1,6 @@
+using k8s.Autorest;
 using TodoApp.Domain.Enum;
+using TodoApp.Domain.Exceptions;
 using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
@@ -149,4 +151,20 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Login as Admin and delete other user, should succeed and user should be deleted")]
+    public async Task LoginAsAdminAndRemoveOtherUser_ShouldSucceed()
+    {
+        var userName = string.RandomText(10);
+        await _userClient.RegisterUserAsync(userName, "zaq1@WSX");
+
+        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
+        {
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userName);
+          var updateResponse = await _userClient.DeleteUserAsync(usersList.Id);
+          var httpException = await Assert.ThrowsAsync<HttpRequestException>(async () => await _userClient.GetUserAsync(usersList.Id));
+
+          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+          Assert.Equal(HttpStatusCode.NotFound, httpException.StatusCode);
+        }
+    }
 }
