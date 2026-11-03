@@ -65,6 +65,24 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Delete own todo item, it should succeed and todo item be deleted ")]
+    public async Task DeleteOwnTodo_Successful()
+    {
+
+        await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
+        {
+            var todoName = string.RandomText(10);
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            var deleteTodoResponse = await _todoClient.DeleteAsync(initialGetTodosResponse.Id);
+            var afterDeleteGetTodosResponse = (await _todoClient.GetPaginatedAsync()).ConvertAll(x => x.Name);
+
+
+            Assert.DoesNotContain(todoName, afterDeleteGetTodosResponse);
+            Assert.Equal(HttpStatusCode.OK, deleteTodoResponse.StatusCode);
+        }
+    }
+
     [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
     public async Task CreateInvalidTodo_ValidationFail()
     {
