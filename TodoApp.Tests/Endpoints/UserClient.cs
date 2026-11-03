@@ -45,4 +45,21 @@ public record UserClient(HttpClient Client)
     {
         return Client.GetFromJsonAsync<List<UserDto>>($"{Base}?page={page}");
     }
+
+    public async Task<List<UserDto>> GetAllUsersAsync()
+    {
+        var result = new List<UserDto>();
+
+        for (var page = 0; ; page++)
+        {
+            var items = await GetUsersAsync(page);
+
+            if (items is null || items.Count == 0)
+            {
+                return result;
+            }
+
+            result.AddRange(items);
+        }
+    }
 }
