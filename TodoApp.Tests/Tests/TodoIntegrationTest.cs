@@ -35,13 +35,14 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
         {
-            var createTodoResponse = await _todoClient.CreateAsync("testing2");
+            var todoName = string.RandomText(10);
+            var createTodoResponse = await _todoClient.CreateAsync(todoName);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
 
             Assert.Equal(HttpStatusCode.Created, createTodoResponse.StatusCode);
             Assert.NotNull(getTodosResponse);
             Assert.Single(getTodosResponse);
-            Assert.Equal("testing2", getTodosResponse[0].Name);
+            Assert.Equal(todoName, getTodosResponse[0].Name);
         }
     }
 
