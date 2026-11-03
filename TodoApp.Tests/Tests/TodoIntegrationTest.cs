@@ -46,6 +46,25 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Fact(DisplayName = "Update own todo item, it should succeed and todo item be updated ")]
+    public async Task UpdateOwnTodo_Successful()
+    {
+
+        await using (await LoginFixture.CreateAsync(_userClient, string.RandomText(10), password, register: true))
+        {
+            var todoName = string.RandomText(10);
+            var newTodoName = string.RandomText(10);
+            await _todoClient.CreateAsync(todoName);
+            var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
+            var updateTodoResponse = await _todoClient.UpdateAsync(initialGetTodosResponse.Id, newTodoName);
+            var afterUpdateGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Id == initialGetTodosResponse.Id);
+
+
+            Assert.Equal(newTodoName, afterUpdateGetTodosResponse.Name);
+            Assert.Equal(HttpStatusCode.OK, updateTodoResponse.StatusCode);
+        }
+    }
+
     [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
     public async Task CreateInvalidTodo_ValidationFail()
     {
@@ -64,7 +83,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Fact(DisplayName = "Create todos as separate users, each user gets own todos and admin sees all")]
-    public async Task CreateTodoAsSeparateUser()
+    public async Task CreateTodoAsSeparateUser_ShouldSucceed()
     {
 
         string firstUserTodo = string.RandomText(10);
