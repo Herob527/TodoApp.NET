@@ -11,7 +11,7 @@ public class DeleteUsercommandHandler(UserManager<ApplicationUser> userManager, 
 {
     public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
-      if (userRepository.Id == request.Id) throw new UnauthorizedAccessException();
+      if (userRepository.Id == request.Id) throw new ConflictException();
 
       var isCurrentAdmin = userRepository.Role == Role.Admin;
 
