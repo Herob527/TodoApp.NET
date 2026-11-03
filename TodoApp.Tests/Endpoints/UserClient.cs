@@ -22,6 +22,10 @@ public record UserClient(HttpClient Client)
         return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name, Role });
     }
 
+
+    public Task<HttpResponseMessage> DeleteUserAsync(string Id) {
+        return Client.DeleteAsync($"{Base}/{Id}");
+    }
     public Task<HttpResponseMessage> UpdateSelfAsync(string Name)
     {
         return Client.PatchAsJsonAsync($"{Base}/me", new { Name });
@@ -62,4 +66,6 @@ public record UserClient(HttpClient Client)
             result.AddRange(items);
         }
     }
+
+
 }
