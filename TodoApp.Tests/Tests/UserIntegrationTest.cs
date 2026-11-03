@@ -6,39 +6,27 @@ using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
 
-public class UserIntegrationTest : IAsyncLifetime
+public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 {
-    private AppHostFixture _fixture = null!;
+    private readonly HttpClient _httpClient;
 
-    private HttpClient _httpClient = null!;
+    private readonly UserClient _userClient;
 
-    private UserClient _userClient = null!;
-
-    private static readonly TimeSpan DefaultTimeout =
-        TimeSpan.FromSeconds(30);
-
-    public async Task InitializeAsync()
+    public UserIntegrationTest(AppHostFixture fixture)
     {
-        _fixture = await AppHostFixture.CreateAsync("user");
-
-        await _fixture
-            .App
-            .StartAsync()
-            .WaitAsync(DefaultTimeout);
-
-        _httpClient = _fixture.App.CreateHttpClient("apiservice");
+        _httpClient = fixture.App.CreateHttpClient("apiservice");
         _userClient = new UserClient(_httpClient);
     }
 
-    public async Task DisposeAsync()
+    public void Dispose()
     {
-        await _fixture.DisposeAsync();
+        _httpClient.Dispose();
     }
 
     [Fact(DisplayName = "Register same user twice, first should be created and second should be conflict")]
     public async Task RegisterSameUserTwiceIsConflict()
     {
-        const string name = "alamakota";
+        var name = string.RandomText(10);
         const string password = "zaq1@WSX";
         var firstResponse = await _userClient.RegisterUserAsync(name, password);
         var secondResponse = await _userClient.RegisterUserAsync(name, password);
@@ -51,7 +39,7 @@ public class UserIntegrationTest : IAsyncLifetime
     public async Task RegisterUserAndLogout()
     {
 
-        const string name = "testing";
+        var name = string.RandomText(10);
         const string cookie =  ".AspNetCore.Identity.Application=";
         const string password = "zaq1@WSX";
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
@@ -73,8 +61,8 @@ public class UserIntegrationTest : IAsyncLifetime
     public async Task RegisterUserAndUpdate()
     {
 
-        const string name = "testing3";
-        const string newName = "testing4";
+        var name = string.RandomText(10);
+        var newName = string.RandomText(10);
         const string password = "zaq1@WSX";
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
 
@@ -110,14 +98,14 @@ public class UserIntegrationTest : IAsyncLifetime
     public async Task LoginAsAdminAndUpdateUser_ShouldSucceed()
     {
 
-        const string name = "testing3";
-        const string newName = "testing4";
+        var name = string.RandomText(10);
+        var newName = string.RandomText(10);
         const string password = "zaq1@WSX";
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == name);
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, newName);
           var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
@@ -133,7 +121,7 @@ public class UserIntegrationTest : IAsyncLifetime
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == AdminUser.Name);
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
           var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
@@ -151,7 +139,7 @@ public class UserIntegrationTest : IAsyncLifetime
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-          var usersList = (await _userClient.GetUsersAsync()).First(x => x.UserName == userName);
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userName);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.Admin);
           var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 

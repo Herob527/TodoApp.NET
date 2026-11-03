@@ -7,39 +7,26 @@ using TodoApp.Tests.Fixtures;
 
 namespace TodoApp.Tests.Tests;
 
-public class TodoIntegrationTest : IAsyncLifetime
+public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 {
-    private AppHostFixture _fixture = null!;
+    private readonly HttpClient _httpClient;
 
-    private HttpClient _httpClient = null!;
+    private readonly TodoClient _todoClient;
 
-    private TodoClient _todoClient = null!;
-
-    private UserClient _userClient = null!;
-
-    private static readonly TimeSpan DefaultTimeout =
-        TimeSpan.FromSeconds(60);
+    private readonly UserClient _userClient;
 
     private const string password = "zaq1@WSX";
 
-
-    public async Task InitializeAsync()
+    public TodoIntegrationTest(AppHostFixture fixture)
     {
-        _fixture = await AppHostFixture.CreateAsync("todo");
-
-        await _fixture
-            .App
-            .StartAsync()
-            .WaitAsync(DefaultTimeout);
-
-        _httpClient = _fixture.App.CreateHttpClient("apiservice");
+        _httpClient = fixture.App.CreateHttpClient("apiservice");
         _todoClient = new TodoClient(_httpClient);
         _userClient = new UserClient(_httpClient);
     }
 
-    public async Task DisposeAsync()
+    public void Dispose()
     {
-        await _fixture.DisposeAsync();
+        _httpClient.Dispose();
     }
 
     [Fact(DisplayName = "Create valid todo item, it should response with created with one item in list")]
@@ -102,17 +89,18 @@ public class TodoIntegrationTest : IAsyncLifetime
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-            var getTodosResponse = await _todoClient.GetPaginatedAsync();
-            users.Add("admin", getTodosResponse!);
+            var getTodosResponse = await _todoClient.GetAllAsync();
+            users.Add("admin", getTodosResponse);
         }
 
         Assert.Single(users[firstUserName]);
         Assert.Single(users[secondUserName]);
-        Assert.Equal(2, users["admin"].Count);
 
         Assert.Equal(firstUserTodo, users[firstUserName][0].Name);
         Assert.Equal(secondUserTodo, users[secondUserName][0].Name);
-        Assert.Equal(firstUserTodo, users["admin"][0].Name);
-        Assert.Equal(secondUserTodo, users["admin"][1].Name);
+
+        var adminTodoNames = users["admin"].Select(x => x.Name).ToList();
+        Assert.Contains(firstUserTodo, adminTodoNames);
+        Assert.Contains(secondUserTodo, adminTodoNames);
     }
 }
