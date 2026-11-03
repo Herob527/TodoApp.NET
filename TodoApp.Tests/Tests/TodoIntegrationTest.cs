@@ -100,7 +100,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(firstUserTodo, users[firstUserName][0].Name);
         Assert.Equal(secondUserTodo, users[secondUserName][0].Name);
 
-        var adminTodoNames = users["admin"].Select(x => x.Name).ToList();
+        var adminTodoNames = users["admin"].ConvertAll(x => x.Name);
         Assert.Contains(firstUserTodo, adminTodoNames);
         Assert.Contains(secondUserTodo, adminTodoNames);
     }
