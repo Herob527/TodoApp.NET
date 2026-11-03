@@ -179,7 +179,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginFixture.CreateAsync(_userClient, AdminUser.Name, AdminUser.Password))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == nonAdminUser);
+          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userNametoRemove);
           userToRemove = await _userClient.GetUserAsync(usersList.Id);
         }
 
