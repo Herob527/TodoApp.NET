@@ -17,7 +17,12 @@ public class GetUsersQueryHandler(
             .OrderBy(x => x.Id)
             .Skip(request.Page * PageSize)
             .Take(PageSize)
-            .Select(user => new UserDto { Id = user.Id, UserName = user.UserName!, Roles = (from userRole in dbContext.UserRoles join role in dbContext.Roles on userRole.RoleId equals role.Id where userRole.UserId == user.Id select role.Name!).ToList() })
+            .Select(user => new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                Roles = (from userRole in dbContext.UserRoles join role in dbContext.Roles on userRole.RoleId equals role.Id where userRole.UserId == user.Id select role.Name!).ToList()
+            })
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 }
