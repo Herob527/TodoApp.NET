@@ -17,14 +17,13 @@ public record UserClient(HttpClient Client)
         return Client.PutAsJsonAsync($"{Base}/login", new { Name, Password });
     }
 
+    public Task<HttpResponseMessage> DeleteUserAsync(string Id) {
+        return Client.DeleteAsync($"{Base}/{Id}");
+    }
+
     public Task<HttpResponseMessage> UpdateUserAsync(string Id, string? Name = null, Role? Role = null)
     {
         return Client.PatchAsJsonAsync($"{Base}/{Id}", new { Name, Role });
-    }
-
-
-    public Task<HttpResponseMessage> DeleteUserAsync(string Id) {
-        return Client.DeleteAsync($"{Base}/{Id}");
     }
     public Task<HttpResponseMessage> UpdateSelfAsync(string Name)
     {
