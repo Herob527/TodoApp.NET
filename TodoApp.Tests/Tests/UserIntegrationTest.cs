@@ -43,12 +43,14 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var name = string.RandomText(10);
         const string cookie =  ".AspNetCore.Identity.Application=";
         const string password = "zaq1@WSX";
+        const string authCookie = "Set-Cookie";
+
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
         var loginResponse = await _userClient.LoginUserAsync(name, password);
         var logoutResponse = await _userClient.LogoutUserAsync();
 
-        var loginAuthCookie = loginResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
-        var logoutAuthCookie = logoutResponse.Headers.GetValues("Set-Cookie")?.SingleOrDefault(x => x.StartsWith(cookie));
+        var loginAuthCookie = loginResponse.Headers.GetValues(authCookie)?.SingleOrDefault(x => x.StartsWith(cookie));
+        var logoutAuthCookie = logoutResponse.Headers.GetValues(authCookie)?.SingleOrDefault(x => x.StartsWith(cookie));
 
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
         Assert.False(loginAuthCookie.StartsWith( $"{cookie};"));
