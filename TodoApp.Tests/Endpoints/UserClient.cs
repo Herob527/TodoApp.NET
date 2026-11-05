@@ -1,20 +1,21 @@
 using System.Net.Http.Json;
 using TodoApp.Contracts.Dto;
 using TodoApp.Domain.Enum;
+using TodoApp.Tests.Data;
 
 namespace TodoApp.Tests.Endpoints;
 public record UserClient(HttpClient Client)
 {
 
   private readonly string Base = "/api/users";
-    public Task<HttpResponseMessage> RegisterUserAsync(string Name, string Password)
+    public Task<HttpResponseMessage> RegisterUserAsync(TestUser user)
     {
-        return Client.PostAsJsonAsync( $"{Base}/register", new { Name, Password });
+        return Client.PostAsJsonAsync( $"{Base}/register", new { Name = user.Name, Password = user.Password });
     }
 
-    public Task<HttpResponseMessage> LoginUserAsync(string Name, string Password)
+    public Task<HttpResponseMessage> LoginUserAsync(TestUser user)
     {
-        return Client.PutAsJsonAsync($"{Base}/login", new { Name, Password });
+        return Client.PutAsJsonAsync($"{Base}/login", new { Name = user.Name, Password = user.Password });
     }
 
     public Task<HttpResponseMessage> DeleteUserAsync(string Id) {

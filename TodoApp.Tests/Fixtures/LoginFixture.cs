@@ -1,3 +1,4 @@
+using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 
 namespace TodoApp.Tests.Fixtures;
@@ -6,20 +7,19 @@ public sealed record LoginFixture(UserClient UserClient, string Name) : IAsyncDi
 {
     public static async Task<LoginFixture> CreateAsync(
         UserClient userClient,
-        string name,
-        string password,
+        TestUser user,
         bool register = false)
     {
         if (register)
         {
-            var registerResponse = await userClient.RegisterUserAsync(name, password);
+            var registerResponse = await userClient.RegisterUserAsync(user);
             registerResponse.EnsureSuccessStatusCode();
         }
 
-        var loginResponse = await userClient.LoginUserAsync(name, password);
+        var loginResponse = await userClient.LoginUserAsync(user);
         loginResponse.EnsureSuccessStatusCode();
 
-        return new LoginFixture(userClient, name);
+        return new LoginFixture(userClient, user.Name);
     }
 
     public async ValueTask DisposeAsync()
