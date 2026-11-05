@@ -67,16 +67,16 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         const string password = "zaq1@WSX";
         var registerResponse = await _userClient.RegisterUserAsync(name, password);
 
-        // Using login fixture causes 401 on users/me
-        _ = await _userClient.LoginUserAsync(name, password);
-        var updateResponse = await _userClient.UpdateSelfAsync(newName);
-        var getMeResponse = await _userClient.GetUserMeAsync();
-        _ = await _userClient.LogoutUserAsync();
 
-        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-        Assert.NotNull(getMeResponse);
-        Assert.Equal(newName, getMeResponse.UserName);
+        await using (await LoginFixture.CreateAsync(_userClient, name, password)) {
+          var updateResponse = await _userClient.UpdateSelfAsync(newName);
+          var getMeResponse = await _userClient.GetUserMeAsync();
+
+          Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+          Assert.NotNull(getMeResponse);
+          Assert.Equal(newName, getMeResponse.UserName);
+        }
     }
 
     [Fact(DisplayName = "Login invalid username of password, should throw not found")]
