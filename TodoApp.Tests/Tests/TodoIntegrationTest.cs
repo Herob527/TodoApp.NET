@@ -28,13 +28,14 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         _httpClient.Dispose();
     }
 
-    [Fact(DisplayName = "Create valid todo item, it should response with created with one item in list")]
-    public async Task CreateValidTodo_Successful()
+    [Theory(DisplayName = "Create valid todo item, it should response with created with one item in list")]
+    [InlineData(1)]
+    [InlineData(TodoConstraints.NameMaxLength)]
+    public async Task CreateValidTodo_Successful(int todoNameLen)
     {
-
         await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
-            var todoName = string.RandomText(10);
+            var todoName = string.RandomText(todoNameLen);
             var createTodoResponse = await _todoClient.CreateAsync(todoName);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
 
@@ -48,9 +49,9 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     [Theory(DisplayName = "Create invalid todo, it should respond with bad request")]
     [InlineData(0)]
     [InlineData(TodoConstraints.NameMaxLength + 1)]
-    public async Task CreateInvalidTodo_ValidationFail(int  StringLen)
+    public async Task CreateInvalidTodo_ValidationFail(int todoLenName)
     {
-        string invalidTodo = string.RandomText(StringLen);
+        string invalidTodo = string.RandomText(todoLenName);
 
         await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
