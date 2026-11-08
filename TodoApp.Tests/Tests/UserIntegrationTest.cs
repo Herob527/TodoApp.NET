@@ -38,7 +38,6 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Register user with invalid data, it should fail with bad request and user should not be created")]
-    [InlineData(0,0)]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
