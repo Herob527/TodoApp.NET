@@ -23,7 +23,6 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
             UserName = request.Name,
         }, request.Password);
 
-        Console.WriteLine(result);
         if (!result.Succeeded)
         {
           throw new NotFoundException();
