@@ -1,3 +1,18 @@
 [tools]
 aspire = "13.6.4"
 "dotnet:dotnet-ef" = "10.0.14"
+
+[tasks.restore]
+run = "dotnet restore"
+
+[tasks.start]
+run = "aspire run"
+
+[tasks.test]
+run = "dotnet test"
+
+[tasks.create_migration]
+usage = '''
+arg "<name>" help="Migration name"
+'''
+run = "dotnet ef migrations add ${usage_name} --project TodoApp.ApiService"
