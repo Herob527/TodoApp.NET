@@ -110,7 +110,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             wasModified = !hasOriginal && hasModified;
         }
 
-        Assert.Equal(HttpStatusCode.Unauthorized, updateTodoResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, updateTodoResponse.StatusCode);
         Assert.False(wasModified);
 
     }
@@ -226,7 +226,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             isTodoStillThere = afterTodoResponse is not null;
         }
 
-        Assert.Equal(HttpStatusCode.Unauthorized, deleteTodoResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, deleteTodoResponse.StatusCode);
         Assert.True(isTodoStillThere);
     }
 

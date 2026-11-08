@@ -202,7 +202,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
           var deleteResponse = await _userClient.DeleteUserAsync(removedUser!.Id);
           var getUser = await _userClient.GetUserAsync(removedUser!.Id);
 
-          Assert.Equal(HttpStatusCode.Unauthorized, deleteResponse.StatusCode);
+          Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
           Assert.NotNull(getUser);
         }
     }
@@ -228,7 +228,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
           var updateResponse = await _userClient.UpdateUserAsync(updatedUser!.Id, Name: string.RandomText(10));
           var getUser = await _userClient.GetUserAsync(updatedUser!.Id);
 
-          Assert.Equal(HttpStatusCode.Unauthorized, updateResponse.StatusCode);
+          Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
           Assert.NotNull(getUser);
           Assert.Equal(updatedUser.UserName, getUser.UserName);
         }
@@ -245,7 +245,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             var updateResponse = await _userClient.UpdateUserAsync(me!.Id, Role: Role.Admin);
             var after = await _userClient.GetUserMeAsync();
 
-            Assert.NotEqual(HttpStatusCode.OK, updateResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
             Assert.DoesNotContain(nameof(Role.Admin), after!.Roles);
         }
     }
