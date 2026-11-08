@@ -233,4 +233,20 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
           Assert.Equal(updatedUser.UserName, getUser.UserName);
         }
     }
+    [Fact(DisplayName = "Login as User and promote self to admin, should fail and role should stay User")]
+    public async Task LoginAsUserAndPromoteSelf_ShouldFail()
+    {
+        var user = TestUser.Random();
+        await _userClient.RegisterUserAsync(user);
+
+        await using (await LoginSession.CreateAsync(_userClient, user))
+        {
+            var me = await _userClient.GetUserMeAsync();
+            var updateResponse = await _userClient.UpdateUserAsync(me!.Id, Role: Role.Admin);
+            var after = await _userClient.GetUserMeAsync();
+
+            Assert.NotEqual(HttpStatusCode.OK, updateResponse.StatusCode);
+            Assert.DoesNotContain(nameof(Role.Admin), after!.Roles);
+        }
+    }
 }
