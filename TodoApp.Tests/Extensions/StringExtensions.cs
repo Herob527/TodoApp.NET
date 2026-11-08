@@ -9,6 +9,7 @@ public static class StringExtensions
   private const string numbers =  "0123456789";
   private const string special = "!@#$%^*()?";
 
+  // Username may not contain special characters, so they're omitted there
   private const string chars = uppercase + lowercase + numbers;
 
   private static readonly Random Random = Random.Shared;
