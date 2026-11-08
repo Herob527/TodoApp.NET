@@ -45,6 +45,21 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
+    [Theory(DisplayName = "Create invalid todo, it should respond with bad request")]
+    [InlineData(0)]
+    [InlineData(TodoConstraints.NameMaxLength + 1)]
+    public async Task CreateInvalidTodo_ValidationFail(int  StringLen)
+    {
+        string invalidTodo = string.RandomText(StringLen);
+
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
+        {
+            var tooLongTodo = await _todoClient.CreateAsync(invalidTodo);
+            Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
+        }
+    }
+
+
     [Fact(DisplayName = "Update own todo item, it should succeed and todo item be updated ")]
     public async Task UpdateOwnTodo_Successful()
     {
@@ -212,20 +227,6 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         Assert.Equal(HttpStatusCode.Unauthorized, deleteTodoResponse.StatusCode);
         Assert.True(isTodoStillThere);
-    }
-
-    [Theory(DisplayName = "Create invalid todo, it should respond with bad request")]
-    [InlineData(0)]
-    [InlineData(TodoConstraints.NameMaxLength + 1)]
-    public async Task CreateInvalidTodo_ValidationFail(int  StringLen)
-    {
-        string invalidTodo = string.RandomText(StringLen);
-
-        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
-        {
-            var tooLongTodo = await _todoClient.CreateAsync(invalidTodo);
-            Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
-        }
     }
 
     [Fact(DisplayName = "Create todos as separate users, each user gets own todos and admin sees all")]
