@@ -51,11 +51,11 @@ public class ExceptionHandlingMiddleware(
         {
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status401Unauthorized,
+                Status = StatusCodes.Status403Forbidden,
                 Title = "Unauthorized"
             };
 
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsJsonAsync(problemDetails);
             return;
         }
