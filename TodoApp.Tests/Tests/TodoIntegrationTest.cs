@@ -4,6 +4,7 @@ using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
+using TodoApp.Tests.Support;
 
 namespace TodoApp.Tests.Tests;
 
@@ -31,7 +32,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     public async Task CreateValidTodo_Successful()
     {
 
-        await using (await LoginFixture.CreateAsync(_userClient, TestUser.Random(), register: true))
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
             var todoName = string.RandomText(10);
             var createTodoResponse = await _todoClient.CreateAsync(todoName);
@@ -48,7 +49,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     public async Task UpdateOwnTodo_Successful()
     {
 
-        await using (await LoginFixture.CreateAsync(_userClient, TestUser.Random(), register: true))
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
             var todoName = string.RandomText(10);
             var newTodoName = string.RandomText(10);
@@ -72,20 +73,20 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var creator = TestUser.Random();
         var unapprovedEditor = TestUser.Random();
         int todoId;
-        await using (await LoginFixture.CreateAsync(_userClient, creator, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, creator, register: true))
         {
             await _todoClient.CreateAsync(todoName);
             var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
             todoId = initialGetTodosResponse.Id;
         }
         HttpResponseMessage updateTodoResponse;
-        await using (await LoginFixture.CreateAsync(_userClient, unapprovedEditor, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, unapprovedEditor, register: true))
         {
             updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: newTodoName);
         }
 
         var wasModified = false;
-        await using (await LoginFixture.CreateAsync(_userClient, creator))
+        await using (await LoginSession.CreateAsync(_userClient, creator))
         {
             var todoList = await _todoClient.GetPaginatedAsync();
             var hasOriginal = todoList.Any(x => x.Name == todoName);
@@ -107,20 +108,20 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var creator = TestUser.Random();
         var unapprovedEditor = TestUser.Random();
         int todoId;
-        await using (await LoginFixture.CreateAsync(_userClient, creator, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, creator, register: true))
         {
             await _todoClient.CreateAsync(todoName);
             var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
             todoId = initialGetTodosResponse.Id;
         }
         HttpResponseMessage updateTodoResponse;
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
             updateTodoResponse = await _todoClient.UpdateAsync(todoId, Name: newTodoName);
         }
 
         var wasModified = false;
-        await using (await LoginFixture.CreateAsync(_userClient, creator))
+        await using (await LoginSession.CreateAsync(_userClient, creator))
         {
             var todoList = await _todoClient.GetPaginatedAsync();
             var hasOriginal = todoList.Any(x => x.Name == todoName);
@@ -137,7 +138,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     public async Task DeleteOwnTodo_Successful()
     {
 
-        await using (await LoginFixture.CreateAsync(_userClient, TestUser.Random(), register: true))
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
             var todoName = string.RandomText(10);
             await _todoClient.CreateAsync(todoName);
@@ -158,7 +159,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         int todoIdToRemove;
         var ownerOfTodo = TestUser.Random();
         var todoName = string.RandomText(10);
-        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, ownerOfTodo, register: true))
         {
             await _todoClient.CreateAsync(todoName);
             var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
@@ -166,13 +167,13 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
 
         HttpResponseMessage deleteTodoResponse;
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
             deleteTodoResponse = await _todoClient.DeleteAsync(todoIdToRemove);
         }
 
         bool isTodoStillThere = false;
-        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo))
+        await using (await LoginSession.CreateAsync(_userClient, ownerOfTodo))
         {
             var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
             isTodoStillThere = afterTodoResponse is not null;
@@ -189,7 +190,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         int todoIdToRemove;
         var ownerOfTodo = TestUser.Random();
         var todoName = string.RandomText(10);
-        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, ownerOfTodo, register: true))
         {
             await _todoClient.CreateAsync(todoName);
             var initialGetTodosResponse = (await _todoClient.GetPaginatedAsync()).First(x => x.Name == todoName);
@@ -197,13 +198,13 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
 
         HttpResponseMessage deleteTodoResponse;
-        await using (await LoginFixture.CreateAsync(_userClient, TestUser.Random(), register: true))
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
             deleteTodoResponse = await _todoClient.DeleteAsync(todoIdToRemove);
         }
 
         bool isTodoStillThere = false;
-        await using (await LoginFixture.CreateAsync(_userClient, ownerOfTodo))
+        await using (await LoginSession.CreateAsync(_userClient, ownerOfTodo))
         {
             var afterTodoResponse = (await _todoClient.GetPaginatedAsync()).FirstOrDefault(x => x.Name == todoName);
             isTodoStillThere = afterTodoResponse is not null;
@@ -219,7 +220,7 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
 
-        await using (await LoginFixture.CreateAsync(_userClient, TestUser.Random(), register: true))
+        await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
 
             var tooShortTodo = await _todoClient.CreateAsync("");
@@ -242,21 +243,21 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         Dictionary<string, List<TodoDto>> users = [];
 
-        await using (await LoginFixture.CreateAsync(_userClient, firstUser, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, firstUser, register: true))
         {
             var todo = await _todoClient.CreateAsync(firstUserTodo);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
             users.Add(firstUser.Name, getTodosResponse!);
         }
 
-        await using (await LoginFixture.CreateAsync(_userClient, secondUser, register: true))
+        await using (await LoginSession.CreateAsync(_userClient, secondUser, register: true))
         {
             var todo = await _todoClient.CreateAsync(secondUserTodo);
             var getTodosResponse = await _todoClient.GetPaginatedAsync();
             users.Add(secondUser.Name, getTodosResponse!);
         }
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
             var getTodosResponse = await _todoClient.GetAllAsync();
             users.Add("admin", getTodosResponse);

@@ -1,11 +1,11 @@
 using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 
-namespace TodoApp.Tests.Fixtures;
+namespace TodoApp.Tests.Support;
 
-public sealed record LoginFixture(UserClient UserClient, string Name) : IAsyncDisposable
+public sealed record LoginSession(UserClient UserClient) : IAsyncDisposable
 {
-    public static async Task<LoginFixture> CreateAsync(
+    public static async Task<LoginSession> CreateAsync(
         UserClient userClient,
         TestUser user,
         bool register = false)
@@ -19,7 +19,7 @@ public sealed record LoginFixture(UserClient UserClient, string Name) : IAsyncDi
         var loginResponse = await userClient.LoginUserAsync(user);
         loginResponse.EnsureSuccessStatusCode();
 
-        return new LoginFixture(userClient, user.Name);
+        return new LoginSession(userClient);
     }
 
     public async ValueTask DisposeAsync()

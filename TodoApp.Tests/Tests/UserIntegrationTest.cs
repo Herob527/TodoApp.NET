@@ -4,6 +4,7 @@ using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
 using TodoApp.Tests.Extensions;
 using TodoApp.Tests.Fixtures;
+using TodoApp.Tests.Support;
 
 namespace TodoApp.Tests.Tests;
 
@@ -67,7 +68,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var registerResponse = await _userClient.RegisterUserAsync(user);
 
 
-        await using (await LoginFixture.CreateAsync(_userClient, user)) {
+        await using (await LoginSession.CreateAsync(_userClient, user)) {
           var updateResponse = await _userClient.UpdateSelfAsync(newName);
           var getMeResponse = await _userClient.GetUserMeAsync();
 
@@ -101,7 +102,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var newName = string.RandomText(10);
         var registerResponse = await _userClient.RegisterUserAsync(user);
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, newName);
@@ -117,7 +118,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     public async Task LoginAsAdminAndUpdateOwn_ShouldFail()
     {
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
@@ -135,7 +136,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var user = TestUser.Random();
         await _userClient.RegisterUserAsync(user);
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
           var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.Admin);
@@ -153,7 +154,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var user = TestUser.Random();
         await _userClient.RegisterUserAsync(user);
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
           var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
@@ -169,7 +170,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
         var userName = string.RandomText(10);
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
           var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
@@ -190,13 +191,13 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         UserDto? removedUser;
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToRemove.Name);
           removedUser = await _userClient.GetUserAsync(usersList.Id);
         }
 
-        await using (await LoginFixture.CreateAsync(_userClient, nonAdminUser))
+        await using (await LoginSession.CreateAsync(_userClient, nonAdminUser))
         {
           var deleteResponse = await _userClient.DeleteUserAsync(removedUser!.Id);
           var getUser = await _userClient.GetUserAsync(removedUser!.Id);
@@ -216,13 +217,13 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         UserDto? updatedUser;
 
-        await using (await LoginFixture.CreateAsync(_userClient, AdminUser.User))
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
           var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToUpdate.Name);
           updatedUser = await _userClient.GetUserAsync(usersList.Id);
         }
 
-        await using (await LoginFixture.CreateAsync(_userClient, nonAdminUser))
+        await using (await LoginSession.CreateAsync(_userClient, nonAdminUser))
         {
           var updateResponse = await _userClient.UpdateUserAsync(updatedUser!.Id, Name: string.RandomText(10));
           var getUser = await _userClient.GetUserAsync(updatedUser!.Id);
