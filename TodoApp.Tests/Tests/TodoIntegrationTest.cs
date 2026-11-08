@@ -214,19 +214,16 @@ public class TodoIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.True(isTodoStillThere);
     }
 
-    [Fact(DisplayName = "Create invalid todo, it should respond with bad request")]
-    public async Task CreateInvalidTodo_ValidationFail()
+    [Theory(DisplayName = "Create invalid todo, it should respond with bad request")]
+    [InlineData(0)]
+    [InlineData(TodoConstraints.NameMaxLength + 1)]
+    public async Task CreateInvalidTodo_ValidationFail(int  StringLen)
     {
-
-        string tooLong = string.RandomText(TodoConstraints.NameMaxLength + 1);
+        string invalidTodo = string.RandomText(StringLen);
 
         await using (await LoginSession.CreateAsync(_userClient, TestUser.Random(), register: true))
         {
-
-            var tooShortTodo = await _todoClient.CreateAsync("");
-            var tooLongTodo = await _todoClient.CreateAsync(tooLong);
-
-            Assert.Equal(HttpStatusCode.BadRequest, tooShortTodo.StatusCode);
+            var tooLongTodo = await _todoClient.CreateAsync(invalidTodo);
             Assert.Equal(HttpStatusCode.BadRequest, tooLongTodo.StatusCode);
         }
     }
