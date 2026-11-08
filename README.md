@@ -29,6 +29,7 @@ Come to think of it, Jira is advanced todo list with collaboration
 ## Stack
 
 - Aspire
+- mise
 - .NET 10
 - Mapster
 - MediatR
@@ -44,8 +45,34 @@ I've used known CQRS.
 
 I've taken a glimpse of Controller-based API and it felt for some reason wrong perhaps due to first exposure with .NET having CQRS.
 
+## Basic Commands
+
+### Install deps
+
+```bash
+mise restore 
+```
+
+### Run app
+
+```sh
+mise start
+```
+
+### Run test
+
+```bash
+mise test
+```
+
+### Create migration
+
+```bash
+mise create_migration [name]
+```
+
 ## TODO
 
-- [ ] Integration tests
+- [x] Integration tests
 - [ ] Blazor frontend
 - [ ] Currently when running integration tests, I cannot have aspire app ran so to fix
