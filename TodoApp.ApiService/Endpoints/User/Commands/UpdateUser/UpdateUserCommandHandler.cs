@@ -30,11 +30,14 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
 
         if (request.Data.Role is not null)
         {
-            if (isAdmin && isModifyingSelf)
+            if (!isAdmin) {
+                throw new UnauthorizedAccessException();
+            }
+            if (isModifyingSelf)
             {
                 throw new BadHttpRequestException("You cannot change your own role");
             }
-            if (isAdmin && !isModifyingSelf)
+            if (!isModifyingSelf)
             {
                 var currentRole = await userManager.GetRolesAsync(user);
                 await userManager.RemoveFromRoleAsync(user, string.Join(", ", currentRole));
