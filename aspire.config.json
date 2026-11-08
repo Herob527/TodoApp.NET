@@ -1,4 +1,5 @@
 {
+  "$schema": "https://aspire.dev/reference/cli/configuration/schema.json",
   "appHost": {
     "path": "TodoApp.AppHost/TodoApp.AppHost.csproj",
     "language": "csharp"

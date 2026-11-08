@@ -3,15 +3,16 @@ using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var containerName = builder.Configuration.GetValue("DBContainerName", "todo-db");
-var adminUser = builder.Configuration.GetValue("AdminUser", "");
-var adminPassword = builder.Configuration.GetValue("AdminPassword", "");
+var adminUser = builder.AddParameter("AdminUser");
+var adminPassword = builder.AddParameter("AdminPassword");
+var containerName = builder.AddParameter("DBContainerName", "todo-db");
+var useVolumes = builder.Configuration.GetValue("UseVolumes", true);
 
 var postgres = builder
       .AddPostgres("db")
-      .WithContainerName(containerName);
+      .WithContainerName(await containerName.Resource.GetValueAsync(CancellationToken.None) ?? "todo-db");
 
-if (builder.Configuration.GetValue("UseVolumes", true)) {
+if (useVolumes) {
   postgres.WithDataVolume("appdata");
 }
 
@@ -26,7 +27,8 @@ var migrations = builder
 
 var apiService = builder
     .AddProject<Projects.TodoApp_ApiService>("apiservice")
-    .WithArgs([$"AdminUser={adminUser}", $"AdminPassword={adminPassword}"])
+    .WithEnvironment("AdminUser", adminUser)
+    .WithEnvironment("AdminPassword", adminPassword)
     .WithHttpHealthCheck("/health")
     .WithReference(db)
     .WithReference(migrations)

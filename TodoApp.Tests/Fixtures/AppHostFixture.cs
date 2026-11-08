@@ -13,10 +13,15 @@ public sealed class AppHostFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var builder =
-            await DistributedApplicationTestingBuilder
-                .CreateAsync<Projects.TodoApp_AppHost>(
-                    ["UseVolumes=false", $"DBContainerName={_containerName}", $"AdminUser={AdminUser.Name}", $"AdminPassword={AdminUser.Password}"]);
+        var args = new[]
+        {
+            "UseVolumes=false",
+            $"Parameters:DBContainerName={_containerName}",
+            $"Parameters:AdminUser={AdminUser.Name}",
+            $"Parameters:AdminPassword={AdminUser.Password}"
+        };
+
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TodoApp_AppHost>(args);
 
         App = builder.Build();
 
