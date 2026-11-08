@@ -25,7 +25,7 @@ public class RegisterUserCommandHandler(UserManager<ApplicationUser> userManager
 
         if (!result.Succeeded)
         {
-          throw new NotFoundException();
+          throw new Exception("Failed to create user");
         }
 
 
