@@ -1,4 +1,5 @@
 using TodoApp.Contracts.Dto;
+using TodoApp.Contracts.Validation;
 using TodoApp.Domain.Enum;
 using TodoApp.Tests.Data;
 using TodoApp.Tests.Endpoints;
@@ -34,6 +35,38 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+    }
+
+    [Theory(DisplayName = "Register user with invalid data, it should fail with bad request and user should not be created")]
+    [InlineData(0,0)]
+    [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
+    [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
+    [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
+    [InlineData(UserConstraints.NameMaxLength, UserConstraints.PasswordMaxLength + 1)]
+    public async Task RegisterUserWithInvalidData_ShouldFail(int usernameLength, int passwordLength)
+    {
+        string password = string.RandomPassword(passwordLength);
+        var user = new TestUser(string.RandomText(usernameLength), password);
+        var firstResponse = await _userClient.RegisterUserAsync(user);
+        var userLoginResponse = await _userClient.LoginUserAsync(user);
+
+        Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, userLoginResponse.StatusCode);
+    }
+
+    [Theory(DisplayName = "Register user with valid data, it should succeed and user should be created")]
+    [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength)]
+    [InlineData(UserConstraints.NameMaxLength, UserConstraints.PasswordMaxLength)]
+    public async Task RegisterUserWithValidData_ShouldSucceed(int usernameLength, int passwordLength)
+    {
+        string password = string.RandomPassword(passwordLength);
+
+        var user = new TestUser(string.RandomText(usernameLength), password);
+        var firstResponse = await _userClient.RegisterUserAsync(user);
+        var userLoginResponse = await _userClient.LoginUserAsync(user);
+
+        Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, userLoginResponse.StatusCode);
     }
 
     [Fact(DisplayName = "Register as User and logout, should succeed and user should not be logged in")]
