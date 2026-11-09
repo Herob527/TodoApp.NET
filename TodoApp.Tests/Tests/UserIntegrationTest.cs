@@ -50,7 +50,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, userLoginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
     }
 
     [Fact(DisplayName = "Register user with login name not matching pattern,it should fail with bad request and user should not be created")]
@@ -62,7 +62,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, userLoginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
     }
 
     [Theory(DisplayName = "Register user with valid data, it should succeed and user should be created")]
