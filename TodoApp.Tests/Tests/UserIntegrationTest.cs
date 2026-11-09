@@ -177,7 +177,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(newName, getMeResponse.UserName);
     }
 
-    [Fact(DisplayName = "Login invalid username of password, should throw not found")]
+    [Fact(DisplayName = "Login invalid username of password, should fail with not found")]
     public async Task LoginOrPasswordInvalid_ThrowsNotFound()
     {
         var realUser = new TestUser(string.RandomText(10), string.RandomText(10));
@@ -278,7 +278,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Login as User and delete other user, should throw insufficient permissions and user should not be deleted")]
+    [Fact(DisplayName = "Login as User and delete other user, should fail with insufficient permissions and user should not be deleted")]
     public async Task LoginAsUserAndRemoveOtherUser_ShouldFail()
     {
         var userToRemove = TestUser.Random();
@@ -304,7 +304,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    [Fact(DisplayName = "Login as User and update other user, should throw insufficient permissions and user should not be updated")]
+    [Fact(DisplayName = "Login as User and update other user, should fail with insufficient permissions and user should not be updated")]
     public async Task LoginAsUserAndUpdateOtherUser_ShouldFail()
     {
         var userToUpdate = TestUser.Random();
