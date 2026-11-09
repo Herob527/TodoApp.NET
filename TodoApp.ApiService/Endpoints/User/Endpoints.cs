@@ -28,7 +28,7 @@ public static class Endpoints
             group.MapGet("/", GetUsers);
             group.MapPost("/", CreateUser);
             group.MapPost("/register", RegisterUser);
-            group.MapPut("/login", LoginUser);
+            group.MapPost("/login", LoginUser);
             group.MapPost("/logout", LogoutUser);
             group.MapPatch("/{id}", UpdateUser);
             group.MapPatch("/me", UpdateUserMe);

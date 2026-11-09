@@ -15,7 +15,7 @@ public record UserClient(HttpClient Client)
 
     public Task<HttpResponseMessage> LoginUserAsync(TestUser user)
     {
-        return Client.PutAsJsonAsync($"{Base}/login", new { Name = user.Name, Password = user.Password });
+        return Client.PostAsJsonAsync($"{Base}/login", new { Name = user.Name, Password = user.Password });
     }
 
     public Task<HttpResponseMessage> DeleteUserAsync(string Id) {
