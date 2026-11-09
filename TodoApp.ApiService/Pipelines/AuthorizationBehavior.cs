@@ -11,7 +11,7 @@ public class AuthorizationBehavior<TRequest, TResponse>(
     IHttpContextAccessor httpContextAccessor,
     UserManager<ApplicationUser> userManager)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : notnull
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
