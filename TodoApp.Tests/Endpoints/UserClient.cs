@@ -36,6 +36,10 @@ public record UserClient(HttpClient Client)
         return Client.PostAsync($"{Base}/logout", null);
     }
 
+    public Task<HttpResponseMessage> CreateUserAsync(TestUser User, Role Role) {
+      return Client.PostAsJsonAsync(Base, new {User.Name, User.Password, Role});
+    }
+
     public Task<UserDto?> GetUserMeAsync()
     {
         return Client.GetFromJsonAsync<UserDto>($"{Base}/me");
