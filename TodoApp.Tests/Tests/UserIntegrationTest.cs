@@ -49,9 +49,10 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var userLoginResponse = await _userClient.LoginUserAsync(user);
         var wasCreated = false;
 
-        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User)) {
-          var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
-          wasCreated = getUsers is not null;
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
+        {
+            var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
+            wasCreated = getUsers is not null;
         }
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
@@ -66,11 +67,11 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
-        var wasCreated = false;
-        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User)) {
-          var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
-          wasCreated = getUsers is not null;
-        }
+        var wasCreated = await WithSession(async () => {
+            var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
+            return getUsers is not null;
+        }, AdminUser.User);
+
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
@@ -97,7 +98,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
 
         var user = TestUser.Random();
-        const string cookie =  ".AspNetCore.Identity.Application=";
+        const string cookie = ".AspNetCore.Identity.Application=";
         const string authCookie = "Set-Cookie";
 
         var registerResponse = await _userClient.RegisterUserAsync(user);
@@ -108,7 +109,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var logoutAuthCookie = logoutResponse.Headers.GetValues(authCookie)?.SingleOrDefault(x => x.StartsWith(cookie));
 
         // Mind the semicolon. If coockie has =;, that means it's empty, which means logout
-        Assert.False(loginAuthCookie.StartsWith( $"{cookie};"));
+        Assert.False(loginAuthCookie.StartsWith($"{cookie};"));
         Assert.StartsWith($"{cookie};", logoutAuthCookie);
         Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
@@ -124,19 +125,21 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var registerResponse = await _userClient.RegisterUserAsync(user);
 
 
-        await using (await LoginSession.CreateAsync(_userClient, user)) {
-          var updateResponse = await _userClient.UpdateSelfAsync(newName);
-          var getMeResponse = await _userClient.GetUserMeAsync();
+        await using (await LoginSession.CreateAsync(_userClient, user))
+        {
+            var updateResponse = await _userClient.UpdateSelfAsync(newName);
+            var getMeResponse = await _userClient.GetUserMeAsync();
 
-          Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
-          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-          Assert.NotNull(getMeResponse);
-          Assert.Equal(newName, getMeResponse.UserName);
+            Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+            Assert.NotNull(getMeResponse);
+            Assert.Equal(newName, getMeResponse.UserName);
         }
     }
 
     [Fact(DisplayName = "Login invalid username of password, should throw not found")]
-    public async Task LoginOrPasswordInvalid_ThrowsNotFound() {
+    public async Task LoginOrPasswordInvalid_ThrowsNotFound()
+    {
         var realUser = new TestUser(string.RandomText(10), string.RandomText(10));
         var invalidUserName = string.RandomText(10);
         var invalidPassword = string.RandomText(10);
@@ -160,13 +163,13 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
-          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, newName);
-          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
+            var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, newName);
+            var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
-          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-          Assert.NotNull(getUpdatedUserResponse);
-          Assert.Equal(newName, getUpdatedUserResponse.UserName);
+            Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+            Assert.NotNull(getUpdatedUserResponse);
+            Assert.Equal(newName, getUpdatedUserResponse.UserName);
         }
     }
 
@@ -176,13 +179,13 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
-          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
-          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
+            var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.User);
+            var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
-          Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
-          Assert.NotNull(getUpdatedUserResponse);
-          Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
+            Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
+            Assert.NotNull(getUpdatedUserResponse);
+            Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
         }
     }
 
@@ -194,13 +197,13 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
-          var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.Admin);
-          var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
+            var updateResponse = await _userClient.UpdateUserAsync(usersList.Id, Role: Role.Admin);
+            var getUpdatedUserResponse = await _userClient.GetUserAsync(usersList.Id);
 
-          Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-          Assert.NotNull(getUpdatedUserResponse);
-          Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
+            Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+            Assert.NotNull(getUpdatedUserResponse);
+            Assert.Contains(nameof(Role.Admin), getUpdatedUserResponse.Roles);
         }
     }
 
@@ -212,28 +215,26 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
-          var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
-          var getUserException = await Assert.ThrowsAsync<HttpRequestException>(async () => await _userClient.GetUserAsync(usersList.Id));
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == user.Name);
+            var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
+            var getUserException = await Assert.ThrowsAsync<HttpRequestException>(async () => await _userClient.GetUserAsync(usersList.Id));
 
-          Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
-          Assert.Equal(HttpStatusCode.NotFound, getUserException.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getUserException.StatusCode);
         }
     }
 
     [Fact(DisplayName = "Login as Admin and delete yourself, should fail and user should not be deleted")]
     public async Task LoginAsAdminAndRemoveYourself_ShouldFail()
     {
-        var userName = string.RandomText(10);
-
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
-          var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
-          var getUser = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == AdminUser.Name);
+            var deleteResponse = await _userClient.DeleteUserAsync(usersList.Id);
+            var getUser = await _userClient.GetUserAsync(usersList.Id);
 
-          Assert.Equal(HttpStatusCode.Conflict, deleteResponse.StatusCode);
-          Assert.NotNull(getUser);
+            Assert.Equal(HttpStatusCode.Conflict, deleteResponse.StatusCode);
+            Assert.NotNull(getUser);
         }
     }
 
@@ -249,17 +250,17 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToRemove.Name);
-          removedUser = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToRemove.Name);
+            removedUser = await _userClient.GetUserAsync(usersList.Id);
         }
 
         await using (await LoginSession.CreateAsync(_userClient, nonAdminUser))
         {
-          var deleteResponse = await _userClient.DeleteUserAsync(removedUser!.Id);
-          var getUser = await _userClient.GetUserAsync(removedUser!.Id);
+            var deleteResponse = await _userClient.DeleteUserAsync(removedUser!.Id);
+            var getUser = await _userClient.GetUserAsync(removedUser!.Id);
 
-          Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
-          Assert.NotNull(getUser);
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
+            Assert.NotNull(getUser);
         }
     }
 
@@ -275,18 +276,18 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
         await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
         {
-          var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToUpdate.Name);
-          updatedUser = await _userClient.GetUserAsync(usersList.Id);
+            var usersList = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == userToUpdate.Name);
+            updatedUser = await _userClient.GetUserAsync(usersList.Id);
         }
 
         await using (await LoginSession.CreateAsync(_userClient, nonAdminUser))
         {
-          var updateResponse = await _userClient.UpdateUserAsync(updatedUser!.Id, Name: string.RandomText(10));
-          var getUser = await _userClient.GetUserAsync(updatedUser!.Id);
+            var updateResponse = await _userClient.UpdateUserAsync(updatedUser!.Id, Name: string.RandomText(10));
+            var getUser = await _userClient.GetUserAsync(updatedUser!.Id);
 
-          Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
-          Assert.NotNull(getUser);
-          Assert.Equal(updatedUser.UserName, getUser.UserName);
+            Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
+            Assert.NotNull(getUser);
+            Assert.Equal(updatedUser.UserName, getUser.UserName);
         }
     }
     [Fact(DisplayName = "Login as User and promote self to admin, should fail and role should stay User")]
@@ -303,6 +304,15 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
 
             Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
             Assert.DoesNotContain(nameof(Role.Admin), after!.Roles);
+        }
+    }
+
+    private async Task<T> WithSession<T>(Func<Task<T>> callback, TestUser user)
+    {
+
+        await using (await LoginSession.CreateAsync(_userClient, user))
+        {
+            return await callback();
         }
     }
 }
