@@ -369,9 +369,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     [Fact(DisplayName = "Login as admin and create valid user, should succeed and new user should be created")]
     public async Task LoginAsAdminAndCreateUser_ShouldSucceed()
     {
-        var user = TestUser.Random();
         var userToCreate = TestUser.Random();
-        await _userClient.RegisterUserAsync(user);
 
         var status = await WithLoginSession(async () => {
             var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
@@ -383,7 +381,6 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(HttpStatusCode.Created, status);
         Assert.NotNull(wasCreated);
     }
-
 
     private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
     {
