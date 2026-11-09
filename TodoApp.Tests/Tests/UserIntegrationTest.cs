@@ -382,6 +382,44 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.NotNull(wasCreated);
     }
 
+    [Theory(DisplayName = "Login as admin and create user with data with invalid length, should fail with bad request and new user should not be created")]
+
+    [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
+    [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
+    [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
+    [InlineData(UserConstraints.NameMaxLength, UserConstraints.PasswordMaxLength + 1)]
+    public async Task LoginAsAdminAndCreateUserWithInvalidData_ShouldFail(int usernameLength, int passwordLength)
+    {
+        var userToCreate = new TestUser(string.RandomText(usernameLength), string.RandomPassword(passwordLength));
+
+        var status = await WithLoginSession(async () => {
+            var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
+            return createStatus.StatusCode;
+        }, AdminUser.User);
+
+        var wasCreated = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+
+        Assert.Equal(HttpStatusCode.BadRequest, status);
+        Assert.Null(wasCreated);
+    }
+
+    [Fact(DisplayName = "Login as admin and create user with name with invalid characters, should fail with bad request and new user should not be created")]
+
+    public async Task LoginAsAdminAndCreateUserWithInvalidCharacters_ShouldFail()
+    {
+        var userToCreate = new TestUser(string.RandomPassword(10), string.RandomPassword(10));
+
+        var status = await WithLoginSession(async () => {
+            var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
+            return createStatus.StatusCode;
+        }, AdminUser.User);
+
+        var wasCreated = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+
+        Assert.Equal(HttpStatusCode.BadRequest, status);
+        Assert.Null(wasCreated);
+    }
+
     private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
     {
 
