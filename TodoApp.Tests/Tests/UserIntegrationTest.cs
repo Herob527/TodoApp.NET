@@ -480,7 +480,9 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             return await _userClient.UpdateUserAsync(user.Id, Role: Role.User);
         }, AdminUser.User);
 
-        var requestAfterDemotion =  await _anotherUserClient.UpdateUserAsync(testingUserData.Id, string.RandomText(10));
+        var requestAfterDemotion = await _anotherUserClient.UpdateUserAsync(testingUserData.Id, string.RandomText(10));
+
+        await _anotherUserClient.LogoutUserAsync();
 
         Assert.Equal(HttpStatusCode.OK, initialRequest.StatusCode);
         Assert.Equal(HttpStatusCode.OK, demoteAnotherAdmin.StatusCode);
