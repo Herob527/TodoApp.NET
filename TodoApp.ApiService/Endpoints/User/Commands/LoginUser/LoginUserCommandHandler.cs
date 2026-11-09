@@ -14,7 +14,7 @@ public class LoginUserCommandHandler(UserManager<ApplicationUser> userManager, S
         var result = await signInManager.PasswordSignInAsync(user, request.Password, true, false);
         if (!result.Succeeded)
         {
-            throw new NotFoundException();
+            throw new Exception("Failed to login user");
         }
     }
 }
