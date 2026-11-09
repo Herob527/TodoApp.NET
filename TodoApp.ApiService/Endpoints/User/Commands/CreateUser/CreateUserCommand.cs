@@ -7,5 +7,3 @@ namespace TodoApp.ApiService.Endpoints.User.Commands.CreateUser;
 
 [Authorize(Roles = nameof(Role.Admin))]
 public record CreateUserCommand(string Name, string Password, Role Role): IRequest;
-
-
