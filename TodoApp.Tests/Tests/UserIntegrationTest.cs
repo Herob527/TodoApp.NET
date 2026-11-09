@@ -38,7 +38,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Register user with invalid data lengths and attempt login, login and register should fail with bad request and user should not be created")]
-    [InlineData(0,0)]
+    [InlineData(0, 0)]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
@@ -357,7 +357,8 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var userToCreate = TestUser.Random();
         await _userClient.RegisterUserAsync(user);
 
-        var status = await WithLoginSession(async () => {
+        var status = await WithLoginSession(async () =>
+        {
             var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
             return createStatus.StatusCode;
         }, user);
@@ -373,7 +374,8 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
         var userToCreate = TestUser.Random();
 
-        var status = await WithLoginSession(async () => {
+        var status = await WithLoginSession(async () =>
+        {
             var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
             return createStatus.StatusCode;
         }, AdminUser.User);
@@ -385,7 +387,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Login as admin and create user with data with invalid length, should fail with bad request and new user should not be created")]
-    [InlineData(0,0)]
+    [InlineData(0, 0)]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
@@ -394,7 +396,8 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
         var userToCreate = new TestUser(string.RandomText(usernameLength), string.RandomPassword(passwordLength));
 
-        var status = await WithLoginSession(async () => {
+        var status = await WithLoginSession(async () =>
+        {
             var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
             return createStatus.StatusCode;
         }, AdminUser.User);
@@ -411,7 +414,8 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     {
         var userToCreate = new TestUser(string.RandomPassword(10), string.RandomPassword(10));
 
-        var status = await WithLoginSession(async () => {
+        var status = await WithLoginSession(async () =>
+        {
             var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
             return createStatus.StatusCode;
         }, AdminUser.User);
