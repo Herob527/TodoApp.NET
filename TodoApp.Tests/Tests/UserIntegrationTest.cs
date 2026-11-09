@@ -366,7 +366,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Null(newUser);
     }
 
-    [Fact(DisplayName = "Login as admin and create another valid user, should succeed and new user should be created")]
+    [Fact(DisplayName = "Login as admin and create valid user, should succeed and new user should be created")]
     public async Task LoginAsAdminAndCreateUser_ShouldSucceed()
     {
         var user = TestUser.Random();
