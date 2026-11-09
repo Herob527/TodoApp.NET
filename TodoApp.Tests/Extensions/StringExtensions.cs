@@ -16,12 +16,15 @@ public static class StringExtensions
 
   extension(string) {
     public static string RandomText(int length) {
+        if (length == 0) return "";
         return new(
             [.. Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)])]
         );
     }
 
     public static string RandomPassword(int length) {
+
+      if (length == 0) return "";
 
       var res = new StringBuilder(length);
       for (int index = 0; length > index; index++) {
