@@ -397,10 +397,10 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             return createStatus.StatusCode;
         }, AdminUser.User);
 
-        var wasCreated = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+        var createdUser = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
 
         Assert.Equal(HttpStatusCode.BadRequest, status);
-        Assert.Null(wasCreated);
+        Assert.Null(createdUser);
     }
 
     [Fact(DisplayName = "Login as admin and create user with name with invalid characters, should fail with bad request and new user should not be created")]
@@ -414,10 +414,10 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             return createStatus.StatusCode;
         }, AdminUser.User);
 
-        var wasCreated = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+        var createdUser = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
 
         Assert.Equal(HttpStatusCode.BadRequest, status);
-        Assert.Null(wasCreated);
+        Assert.Null(createdUser);
     }
 
     private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
