@@ -330,6 +330,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             Assert.Equal(updatedUser.UserName, getUser.UserName);
         }
     }
+
     [Fact(DisplayName = "Login as User and promote self to admin, should fail and role should stay User")]
     public async Task LoginAsUserAndPromoteSelf_ShouldFail()
     {
@@ -346,6 +347,43 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
             Assert.DoesNotContain(nameof(Role.Admin), after!.Roles);
         }
     }
+
+    [Fact(DisplayName = "Login as User and create another user, should fail and new user should not be created")]
+    public async Task LoginAsUserAndCreateUser_ShouldFail()
+    {
+        var user = TestUser.Random();
+        var userToCreate = TestUser.Random();
+        await _userClient.RegisterUserAsync(user);
+
+        var status = await WithLoginSession(async () => {
+            var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
+            return createStatus.StatusCode;
+        }, user);
+
+        var newUser = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+
+        Assert.Equal(HttpStatusCode.Forbidden, status);
+        Assert.Null(newUser);
+    }
+
+    [Fact(DisplayName = "Login as admin and create another valid user, should succeed and new user should be created")]
+    public async Task LoginAsAdminAndCreateUser_ShouldSucceed()
+    {
+        var user = TestUser.Random();
+        var userToCreate = TestUser.Random();
+        await _userClient.RegisterUserAsync(user);
+
+        var status = await WithLoginSession(async () => {
+            var createStatus = await _userClient.CreateUserAsync(userToCreate, Role.User);
+            return createStatus.StatusCode;
+        }, AdminUser.User);
+
+        var wasCreated = await WithLoginSession(async () => (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == userToCreate.Name), AdminUser.User);
+
+        Assert.Equal(HttpStatusCode.Created, status);
+        Assert.NotNull(wasCreated);
+    }
+
 
     private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
     {
