@@ -37,32 +37,44 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
     }
 
-    [Theory(DisplayName = "Register user with invalid data lengths, it should fail with bad request and user should not be created")]
+    [Theory(DisplayName = "Register user with invalid data lengths and attempt login, login and register should fail with bad request and user should not be created")]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMaxLength, UserConstraints.PasswordMaxLength + 1)]
     public async Task RegisterUserWithInvalidDataLength_ShouldFail(int usernameLength, int passwordLength)
     {
-        string password = string.RandomPassword(passwordLength);
-        var user = new TestUser(string.RandomText(usernameLength), password);
+        var user = new TestUser(string.RandomText(usernameLength), string.RandomPassword(passwordLength));
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
+        var wasCreated = false;
+
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User)) {
+          var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
+          wasCreated = getUsers is not null;
+        }
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
+        Assert.False(wasCreated);
     }
 
-    [Fact(DisplayName = "Register user with login name not matching pattern,it should fail with bad request and user should not be created")]
+    [Fact(DisplayName = "Register user with login name not matching pattern and attempt login, login and register should fail with bad request and user should not be created")]
     public async Task RegisterUserWithInvalidLogin_ShouldFail()
     {
-        string password = string.RandomPassword(10);
-        var user = new TestUser(string.RandomPassword(10), password);
+        var user = new TestUser(string.RandomPassword(10), string.RandomPassword(10));
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
+        var wasCreated = false;
+        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User)) {
+          var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
+          wasCreated = getUsers is not null;
+        }
+
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
+        Assert.False(wasCreated);
     }
 
     [Theory(DisplayName = "Register user with valid data, it should succeed and user should be created")]
