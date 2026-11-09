@@ -38,6 +38,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Register user with invalid data lengths and attempt login, login and register should fail with bad request and user should not be created")]
+    [InlineData(0,0)]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
@@ -60,6 +61,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Update user with invalid new name lengths, update should fail with bad request and user should not be updated")]
+    [InlineData(0)]
     [InlineData(UserConstraints.NameMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1)]
     public async Task UpdateUserWithInvalidDataLength_ShouldFail(int usernameLength)
@@ -383,7 +385,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
     }
 
     [Theory(DisplayName = "Login as admin and create user with data with invalid length, should fail with bad request and new user should not be created")]
-
+    [InlineData(0,0)]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
