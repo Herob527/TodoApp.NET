@@ -68,16 +68,16 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var newUserName = string.RandomText(usernameLength);
         await _userClient.RegisterUserAsync(user);
 
-        var (wasUpdated, wasBadRequest) = await WithLoginSession(async () =>
+        var result = await WithLoginSession(async () =>
         {
             var initialGetUser = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
             var updateUserRequest = await _userClient.UpdateUserAsync(initialGetUser!.Id, newUserName);
-            var afterUpdateUser = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.Id == initialGetUser.Id);
-            return (initialGetUser.UserName != afterUpdateUser!.UserName, updateUserRequest.StatusCode == HttpStatusCode.BadRequest );
+            var afterUpdateUser = await _userClient.GetUserAsync(initialGetUser.Id);
+            return new { wasUpdated = initialGetUser.UserName != afterUpdateUser!.UserName, wasBadRequest = updateUserRequest.StatusCode == HttpStatusCode.BadRequest };
         }, AdminUser.User);
 
-        Assert.False(wasUpdated);
-        Assert.True(wasBadRequest);
+        Assert.False(result.wasUpdated);
+        Assert.True(result.wasBadRequest);
     }
 
     [Fact(DisplayName = "Register user with login name not matching pattern and attempt login, login and register should fail with bad request and user should not be created")]
