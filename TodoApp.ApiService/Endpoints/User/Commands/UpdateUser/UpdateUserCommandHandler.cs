@@ -16,7 +16,7 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
         var isAdmin = userRepository.Role == Role.Admin;
         var isModifyingSelf = currentUser == request.Id;
 
-        if (!(isAdmin || isModifyingSelf)) throw new UnauthorizedAccessException();
+        if (!isAdmin && !isModifyingSelf) throw new UnauthorizedAccessException();
 
         var user = await userManager.FindByIdAsync(request.Id) ?? throw new NotFoundException();
 
