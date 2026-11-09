@@ -47,13 +47,12 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var user = new TestUser(string.RandomText(usernameLength), string.RandomPassword(passwordLength));
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
-        var wasCreated = false;
 
-        await using (await LoginSession.CreateAsync(_userClient, AdminUser.User))
+        var wasCreated = await WithLoginSession(async () =>
         {
             var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
-            wasCreated = getUsers is not null;
-        }
+            return getUsers is not null;
+        }, AdminUser.User);
 
         Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, userLoginResponse.StatusCode);
@@ -67,7 +66,8 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
-        var wasCreated = await WithSession(async () => {
+        var wasCreated = await WithLoginSession(async () =>
+        {
             var getUsers = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
             return getUsers is not null;
         }, AdminUser.User);
@@ -124,17 +124,17 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         var newName = string.RandomText(10);
         var registerResponse = await _userClient.RegisterUserAsync(user);
 
-
-        await using (await LoginSession.CreateAsync(_userClient, user))
+        var (updateResponse, getMeResponse) = await WithLoginSession(async () =>
         {
             var updateResponse = await _userClient.UpdateSelfAsync(newName);
             var getMeResponse = await _userClient.GetUserMeAsync();
+            return (updateResponse, getMeResponse);
+        }, user);
 
-            Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-            Assert.NotNull(getMeResponse);
-            Assert.Equal(newName, getMeResponse.UserName);
-        }
+        Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        Assert.NotNull(getMeResponse);
+        Assert.Equal(newName, getMeResponse.UserName);
     }
 
     [Fact(DisplayName = "Login invalid username of password, should throw not found")]
@@ -307,7 +307,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         }
     }
 
-    private async Task<T> WithSession<T>(Func<Task<T>> callback, TestUser user)
+    private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
     {
 
         await using (await LoginSession.CreateAsync(_userClient, user))
