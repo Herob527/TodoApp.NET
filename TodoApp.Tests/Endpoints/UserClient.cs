@@ -10,13 +10,14 @@ public record UserClient(HttpClient Client)
   private readonly string Base = "/api/users";
     public Task<HttpResponseMessage> RegisterUserAsync(TestUser user)
     {
-        return Client.PostAsJsonAsync( $"{Base}/register", new { Name = user.Name, Password = user.Password });
+        return Client.PostAsJsonAsync( $"{Base}/register", new { user.Name, user.Password });
     }
 
     public Task<HttpResponseMessage> LoginUserAsync(TestUser user)
     {
-        return Client.PostAsJsonAsync($"{Base}/login", new { Name = user.Name, Password = user.Password });
+        return Client.PostAsJsonAsync($"{Base}/login", new { user.Name, user.Password });
     }
+
 
     public Task<HttpResponseMessage> DeleteUserAsync(string Id) {
         return Client.DeleteAsync($"{Base}/{Id}");
