@@ -80,6 +80,25 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.True(result.wasBadRequest);
     }
 
+    [Fact(DisplayName = "Update user with name containing invalid characters, update should fail with bad request and user should not be updated")]
+    public async Task UpdateUserWithInvalidCharacters_ShouldFail()
+    {
+        var user = new TestUser(string.RandomText(10), string.RandomPassword(10));
+        var newUserName = string.RandomPassword(10);
+        await _userClient.RegisterUserAsync(user);
+
+        var result = await WithLoginSession(async () =>
+        {
+            var initialGetUser = (await _userClient.GetAllUsersAsync()).FirstOrDefault(x => x.UserName == user.Name);
+            var updateUserRequest = await _userClient.UpdateUserAsync(initialGetUser!.Id, newUserName);
+            var afterUpdateUser = await _userClient.GetUserAsync(initialGetUser.Id);
+            return new { wasUpdated = initialGetUser.UserName != afterUpdateUser!.UserName, wasBadRequest = updateUserRequest.StatusCode == HttpStatusCode.BadRequest };
+        }, AdminUser.User);
+
+        Assert.False(result.wasUpdated);
+        Assert.True(result.wasBadRequest);
+    }
+
     [Fact(DisplayName = "Register user with login name not matching pattern and attempt login, login and register should fail with bad request and user should not be created")]
     public async Task RegisterUserWithInvalidLogin_ShouldFail()
     {
