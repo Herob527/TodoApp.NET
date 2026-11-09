@@ -8,8 +8,15 @@ public class RegisterUserCommandValidator: AbstractValidator<RegisterUserCommand
 {
   public RegisterUserCommandValidator()
   {
-    RuleFor(x => x.Name).NotEmpty().MinimumLength(UserConstraints.NameMinLength).MaximumLength(UserConstraints.NameMaxLength);
-    RuleFor(x => x.Password).NotEmpty().MinimumLength(UserConstraints.PasswordMinLength).MaximumLength(UserConstraints.PasswordMaxLength);
+    RuleFor(x => x.Name)
+      .NotEmpty()
+      .MinimumLength(UserConstraints.NameMinLength)
+      .MaximumLength(UserConstraints.NameMaxLength)
+      .Matches(UserConstraints.NamePattern);
+    RuleFor(x => x.Password)
+      .NotEmpty()
+      .MinimumLength(UserConstraints.PasswordMinLength)
+      .MaximumLength(UserConstraints.PasswordMaxLength);
   }
 }
 
