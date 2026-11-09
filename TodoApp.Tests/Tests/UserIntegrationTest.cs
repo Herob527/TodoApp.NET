@@ -59,7 +59,7 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.False(wasCreated);
     }
 
-    [Theory(DisplayName = "Update user with invalid data lengths and attempt login, update should fail with bad request and user should not be updated")]
+    [Theory(DisplayName = "Update user with invalid new name lengths, update should fail with bad request and user should not be updated")]
     [InlineData(UserConstraints.NameMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1)]
     public async Task UpdateUserWithInvalidDataLength_ShouldFail(int usernameLength)
