@@ -37,15 +37,27 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
     }
 
-    [Theory(DisplayName = "Register user with invalid data, it should fail with bad request and user should not be created")]
+    [Theory(DisplayName = "Register user with invalid data lengths, it should fail with bad request and user should not be created")]
     [InlineData(UserConstraints.NameMinLength - 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMinLength, UserConstraints.PasswordMinLength - 1)]
     [InlineData(UserConstraints.NameMaxLength + 1, UserConstraints.PasswordMinLength)]
     [InlineData(UserConstraints.NameMaxLength, UserConstraints.PasswordMaxLength + 1)]
-    public async Task RegisterUserWithInvalidData_ShouldFail(int usernameLength, int passwordLength)
+    public async Task RegisterUserWithInvalidDataLength_ShouldFail(int usernameLength, int passwordLength)
     {
         string password = string.RandomPassword(passwordLength);
         var user = new TestUser(string.RandomText(usernameLength), password);
+        var firstResponse = await _userClient.RegisterUserAsync(user);
+        var userLoginResponse = await _userClient.LoginUserAsync(user);
+
+        Assert.Equal(HttpStatusCode.BadRequest, firstResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, userLoginResponse.StatusCode);
+    }
+
+    [Fact(DisplayName = "Register user with login name not matching pattern,it should fail with bad request and user should not be created")]
+    public async Task RegisterUserWithInvalidLogin_ShouldFail()
+    {
+        string password = string.RandomPassword(10);
+        var user = new TestUser(string.RandomPassword(10), password);
         var firstResponse = await _userClient.RegisterUserAsync(user);
         var userLoginResponse = await _userClient.LoginUserAsync(user);
 
