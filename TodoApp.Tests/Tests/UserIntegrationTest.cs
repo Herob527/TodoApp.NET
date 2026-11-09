@@ -422,6 +422,36 @@ public class UserIntegrationTest : IClassFixture<AppHostFixture>, IDisposable
         Assert.Null(createdUser);
     }
 
+    [Fact(DisplayName = "Create admin user and demote it to user as other admin, should succeed and demoted admin should not be allowed to use admin endpoints")]
+
+    public async Task CreateAdminUserAndDemoteItAsAdmin_ShouldSucceed()
+    {
+        var anotherAdmin = new TestUser(string.RandomText(10), string.RandomPassword(10));
+        var testingUser = new TestUser(string.RandomText(10), string.RandomPassword(10));
+
+
+        var testingUserData = await WithLoginSession(async () =>
+        {
+            await _userClient.CreateUserAsync(anotherAdmin, Role.Admin);
+            await _userClient.CreateUserAsync(testingUser, Role.User);
+            return (await _userClient.GetAllUsersAsync()).First(x => x.UserName == testingUser.Name);
+        }, AdminUser.User);
+
+        var initialRequest = await WithLoginSession(async () => await _userClient.UpdateUserAsync(testingUserData.Id, string.RandomText(10)), anotherAdmin);
+
+        var demoteAnotherAdmin = await WithLoginSession(async () =>
+        {
+            var user = (await _userClient.GetAllUsersAsync()).First(x => x.UserName == anotherAdmin.Name);
+            return await _userClient.UpdateUserAsync(user.Id, Role: Role.User);
+        }, AdminUser.User);
+
+        var requestAfterDemotion = await WithLoginSession(async () => await _userClient.UpdateUserAsync(testingUserData.Id, string.RandomText(10)), anotherAdmin);
+
+        Assert.Equal(HttpStatusCode.OK, initialRequest.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, demoteAnotherAdmin.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, requestAfterDemotion.StatusCode);
+    }
+
     private async Task<T> WithLoginSession<T>(Func<Task<T>> callback, TestUser user)
     {
 
