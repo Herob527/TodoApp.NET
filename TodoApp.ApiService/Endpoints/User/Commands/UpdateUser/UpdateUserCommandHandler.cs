@@ -13,7 +13,7 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager, 
     public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var currentUser = userRepository.Id ?? throw new UnauthorizedAccessException();
-        var isAdmin = userRepository.Role == Role.Admin;
+        var isAdmin = await userRepository.IsInRoleAsync(Role.Admin, cancellationToken);
         var isModifyingSelf = currentUser == request.Id;
 
         if (!isAdmin && !isModifyingSelf) throw new UnauthorizedAccessException();

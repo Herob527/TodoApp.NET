@@ -15,7 +15,7 @@ public class GetTodosQueryHandler(TodoContext db, CurrentUser userRepository): I
     {
 
         var userId = userRepository.Id ?? throw new UnauthorizedAccessException();
-        var isAdmin = userRepository.Role == Role.Admin;
+        var isAdmin = await userRepository.IsInRoleAsync(Role.Admin, cancellationToken);
 
         var query = db
           .Todos

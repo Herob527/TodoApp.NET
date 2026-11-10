@@ -19,7 +19,7 @@ public class UpdateTodoHandler(TodoContext db, CurrentUser userRepository): IReq
           .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken: cancellationToken) ?? throw new NotFoundException();
 
       var isOwner = item.OwnerId == userId;
-      var isAdmin = userRepository.Role == Role.Admin;
+      var isAdmin = await userRepository.IsInRoleAsync(Role.Admin, cancellationToken);
 
       if (!(isOwner || isAdmin)) throw new UnauthorizedAccessException();
 

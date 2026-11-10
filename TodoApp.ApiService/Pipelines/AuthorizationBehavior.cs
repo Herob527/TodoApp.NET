@@ -1,15 +1,13 @@
 using System.Reflection;
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using TodoApp.Domain.Entity;
+using TodoApp.ApiService.Services;
 
 namespace TodoApp.ApiService.Pipelines;
 
 public class AuthorizationBehavior<TRequest, TResponse>(
     IHttpContextAccessor httpContextAccessor,
-    UserManager<ApplicationUser> userManager)
+    CurrentUser currentUser)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
@@ -28,44 +26,16 @@ public class AuthorizationBehavior<TRequest, TResponse>(
             throw new UnauthorizedAccessException();
         }
 
-        var user = await userManager.GetUserAsync(httpContext.User) ?? throw new UnauthorizedAccessException();
-
-        var roles = await userManager.GetRolesAsync(user);
-        var claims = await userManager.GetClaimsAsync(user);
-
-        var userRoles = roles.ToList();
-        foreach (var claim in claims.Where(c => c.Type == "role" || c.Type == ClaimTypes.Role))
-        {
-            if (!userRoles.Contains(claim.Value))
-            {
-                userRoles.Add(claim.Value);
-            }
-        }
-
-        if (httpContext.User != null)
-        {
-            foreach (var claim in httpContext.User.Claims.Where(c => c.Type == "role" || c.Type == ClaimTypes.Role))
-            {
-                if (!userRoles.Contains(claim.Value))
-                {
-                    userRoles.Add(claim.Value);
-                }
-            }
-        }
-
         var authorizeAttribute = requestType.GetCustomAttribute<AuthorizeAttribute>();
-        if (authorizeAttribute != null)
+        if (authorizeAttribute is null || string.IsNullOrEmpty(authorizeAttribute.Roles))
         {
-            if (!string.IsNullOrEmpty(authorizeAttribute.Roles))
-            {
-                var requiredRoles = authorizeAttribute.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                if (!requiredRoles.Any(userRoles.Contains))
-                {
-                    throw new UnauthorizedAccessException();
-                }
-            }
-
             return await next(cancellationToken);
+        }
+
+        var requiredRoles = authorizeAttribute.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (!await currentUser.IsInAnyRoleAsync(requiredRoles, cancellationToken))
+        {
+            throw new UnauthorizedAccessException();
         }
 
         return await next(cancellationToken);

@@ -13,7 +13,7 @@ public class DeleteUsercommandHandler(UserManager<ApplicationUser> userManager, 
     {
       if (userRepository.Id == request.Id) throw new ConflictException();
 
-      var isCurrentAdmin = userRepository.Role == Role.Admin;
+      var isCurrentAdmin = await userRepository.IsInRoleAsync(Role.Admin, cancellationToken);
 
       if (!isCurrentAdmin) throw new UnauthorizedAccessException();
 
