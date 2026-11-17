@@ -1,5 +1,5 @@
 [tools]
-aspire = "13.6.4"
+aspire = "13.6.5"
 "dotnet:dotnet-ef" = "10.0.14"
 
 [tasks.restore]
